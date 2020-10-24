@@ -26,7 +26,7 @@
  - в :file_folder: _..\luaScr\user\video_
 ---------------------------------------------
 **Удалить несовместимые и неактуальные скрипты**
-- использовать **[remove-ilegal-scripts][remove]**
+- использовать **[remove-illegal-scripts][remove]**
 ---------------------------------------------
 
 [Issues]: https://github.com/Nexterr/simpleTV-script-YT/issues "Issues"
@@ -36,7 +36,7 @@
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
 [License]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
-[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-ilegal-scripts "remove ilegal scripts"
+[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "remove ilegal scripts"
 
 [badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT.svg?style=flat-square "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT.svg?style=flat-square "Forks"
