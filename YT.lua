@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/10/20)
+-- видеоскрипт для сайта https://www.youtube.com (26/10/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ local infoInFile = false
 		infoInFile = os.clock()
 	end
 	m_simpleTV.OSD.ShowMessageT({text = '', color = 0xFF8080FF, showTime = 1000, id = 'channelName'})
-	local htmlEntities = require 'htmlEntities'
+	htmlEntities = require 'htmlEntities'
 	require 'ex'
 	require 'lfs'
 	require 'jsdecode'
