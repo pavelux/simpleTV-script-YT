@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (26/10/20)
+-- видеоскрипт для сайта https://www.youtube.com (27/10/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -1557,7 +1557,8 @@ https://github.com/grafi-tt/lunaJson
 					i = i + 1
 				end
 		end
-		m_simpleTV.User.YT.sts = answer:match('this%.signatureTimestamp[=:](%d+)') or answer:match('"web_player_sts"%)%?(%d+)')
+		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)')
+								or answer:match('[%.,]sts:["]*(%d+)')
 		m_simpleTV.User.YT.signScr = signScr
 	end
 	local function DeCipherSign(adr)
