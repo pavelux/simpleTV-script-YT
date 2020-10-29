@@ -3,6 +3,7 @@
 [![Stars][badge-stars]][Stars]
 
 [![scripts][badge-scripts]][Scripts]
+
 [![simpleTV IPTV player API][badge-simpletvapi]][simpleTV API]
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
