@@ -2372,14 +2372,8 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return t, title
 	end
-	local function AddInPl_Videos_YT(str, tab, typePlst)
-		local i = #tab + 1
-		local ret = false
-		str = str:gsub('\\"', '%%22')
-		if typePlst == 'channels'
-			or typePlst == 'rss_channels'
-		then
-			local desc, count, count2, subCount, logo, name, adr
+	local function Videos_channels(str, tab, typePlst, i)
+		local desc, count, count2, subCount, logo, name, adr
 			for g in str:gmatch('"channelRenderer".-"subscribeButton"') do
 				name = g:match('"simpleText":"([^"]+)')
 				adr = g:match('"channelId":"([^"]+)')
@@ -2423,8 +2417,10 @@ https://github.com/grafi-tt/lunaJson
 					ret = true
 				end
 			end
-		elseif typePlst == 'rss_videos'	then
-			local name, published, adr, desc, panelDescName
+	 return ret
+	end
+	local function Videos_rss_videos(str, tab, typePlst, i)
+		local name, published, adr, desc, panelDescName
 			for gg in str:gmatch('<entry>.-</entry>') do
 				name = gg:match('<title>([^<]+)')
 				adr = gg:match('<yt:videoId>([^<]+)')
@@ -2457,8 +2453,10 @@ https://github.com/grafi-tt/lunaJson
 					ret = true
 				end
 			end
-		else
-			local times, count, publis, channel, name, adr, play_all, desc, upcoming, panelDescName
+	 return ret
+	end
+	local function Videos_plst(str, tab, typePlst, i)
+		local times, count, publis, channel, name, adr, play_all, desc, upcoming, panelDescName
 			for c in str:gmatch('[eod]Renderer".-"thumbnailOverlayNowPlayingRenderer"') do
 				name = c:match('"title":{"runs":%[{"text":"([^"]+)') or c:match('"simpleText":"([^"]+)')
 				adr = c:match('"videoId":"([^"]+)')
@@ -2516,6 +2514,20 @@ https://github.com/grafi-tt/lunaJson
 					ret = true
 				end
 			end
+	 return ret
+	end
+	local function AddInPl_Videos_YT(str, tab, typePlst)
+		local i = #tab + 1
+		local ret = false
+		str = str:gsub('\\"', '%%22')
+		if typePlst == 'channels'
+			or typePlst == 'rss_channels'
+		then
+			ret = Videos_channels(str, tab, typePlst, i)
+		elseif typePlst == 'rss_videos'	then
+			ret = Videos_rss_videos(str, tab, typePlst, i)
+		else
+			ret = Videos_plst(str, tab, typePlst, i)
 		end
 	 return ret
 	end
