@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (27/10/20)
+-- видеоскрипт для сайта https://www.youtube.com (29/10/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -2424,27 +2424,22 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		elseif typePlst == 'rss_videos'	then
-			local name, updated, adr, desc, panelDescName
+			local name, published, adr, desc, panelDescName
 			for gg in str:gmatch('<entry>.-</entry>') do
 				name = gg:match('<title>([^<]+)')
 				adr = gg:match('<yt:videoId>([^<]+)')
-				if name and adr then
-					updated = gg:match('<updated>([^<]+)') or ''
+				published = gg:match('<published>([^<]+)')
+				if name and adr and published then
 					tab[i] = {}
 					tab[i].Id = i
 					name = title_clean(name)
 					tab[i].Address = string.format('https://www.youtube.com/watch?v=%s&isPlst=true', adr)
-					if updated ~= '' then
-						updated = timeStamp(updated)
-						updated = os.date('%y %d %m %H %M', tonumber(updated))
-						local year, day, month, hour, min = updated:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
-						updated = string.format('%d/%d/%02d %d:%02d', day, month, year, hour, min)
-					end
+					published = timeStamp(published)
+					published = os.date('%y %d %m %H %M', tonumber(published))
+					local year, day, month, hour, min = published:match('(%d+) (%d+) (%d+) (%d+) (%d+)')
+					published = string.format('%d/%d/%02d %d:%02d', day, month, year, hour, min)
 					if isInfoPanel == false then
-						if updated ~= '' then
-							updated = ' (' .. updated .. ')'
-						end
-						tab[i].Name = name .. updated
+						tab[i].Name = name .. ' (' .. published .. ')'
 					else
 						tab[i].Name = name
 						tab[i].InfoPanelName = name
@@ -2456,10 +2451,7 @@ https://github.com/grafi-tt/lunaJson
 						if desc and desc ~= '' then
 							panelDescName = m_simpleTV.User.YT.Lng.desc
 						end
-						if updated ~= '' then
-							panelDescName = (panelDescName or '') .. ' | ' .. updated
-						end
-						tab[i].InfoPanelTitle = panelDescName or ' '
+						tab[i].InfoPanelTitle = (panelDescName or '') .. ' | ' .. published
 					end
 					i = i + 1
 					ret = true
