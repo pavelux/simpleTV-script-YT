@@ -12,8 +12,8 @@
 <table class="inline" style="height: 107px;" width="586">
 <tbody>
 <tr class="row0">
-<th class="col0" style="width: 96.0167px;"><a href="http://iptv.gen12.net/"><img class="media" src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/simpleTv-logo.png" alt="simpleTV" /></a></th>
-<th class="col1 rightalign" style="width: 473.983px;" colspan="3">
+<th class="col0" ><a href="http://iptv.gen12.net/"><img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/logo_f1.png" width="100px" alt="simpleTV" /></a></th>
+<th class="col1 rightalign" " colspan="3">
 <h2 style="text-align: left;"><strong class="">Скрипт YT для IPTV плеера <a class="urlextern" title="http://iptv.gen12.net" href="http://iptv.gen12.net" target="_tab" rel="nofollow noopener">simpleTV</a></strong></h2><p>0.5.0 b12.7.5 (x32/x64 vlc 3.0.11)</p>
 </th>
 </tr>
