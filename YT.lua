@@ -86,6 +86,7 @@ local infoInFile = false
 		if not inAdr:match('^https://[%a%.]*youtu[%.combe]') and not inAdr:match('^https://y[2out]*u%.be/') then
 			inAdr = inAdr:gsub('^https://.-(/.+)', 'https://www.youtube.com%1')
 		end
+		inAdr = inAdr:gsub('^https://youtube%.com', 'https://www.youtube.com')
 	end
 	if not m_simpleTV.User then
 		m_simpleTV.User = {}
