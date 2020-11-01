@@ -1,4 +1,4 @@
-**[:ru: русский][RU]**
+ ###### **[:ru: русский][RU]**
 
 [![Issues][badge-issues]][Issues]
 [![Forks][badge-forks]][Forks]
