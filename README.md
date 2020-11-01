@@ -44,7 +44,7 @@
 [remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "remove ilegal scripts"
 [simpleTV homepage]: http://iptv.gen12.net "simpleTV homepage"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "simpleTV bugtracker"
-[EN]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/README-EN.md "english"
+[EN]: https://github.com/Nexterr/simpleTV-script-YT/blob/main/README-EN.md "english"
 
 [badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT.svg?style=flat-square "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT.svg?style=flat-square "Forks"
