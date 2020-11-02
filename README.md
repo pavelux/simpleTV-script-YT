@@ -37,7 +37,7 @@
 [Issues]: https://github.com/Nexterr/simpleTV-script-YT/issues "Issues"
 [Forks]: https://github.com/Nexterr/simpleTV-script-YT/network/members "Forks"
 [Stars]: https://github.com/Nexterr/simpleTV-script-YT/stargazers "Stars"
-[Scripts]: https://github.com/Nexterr/simpleTV-scripts "Скрипты"
+[Scripts]: https://github.com/Nexterr/simpleTV-scripts "скрипты: видео | скраперы | дополнения"
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
 [License]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
