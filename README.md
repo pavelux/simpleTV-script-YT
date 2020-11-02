@@ -36,17 +36,17 @@
 - использовать **[remove-illegal-scripts][remove]**
 ---------------------------------------------
 
-[Issues]: https://github.com/Nexterr/simpleTV-script-YT/issues "Issues"
-[Forks]: https://github.com/Nexterr/simpleTV-script-YT/network/members "Forks"
-[Stars]: https://github.com/Nexterr/simpleTV-script-YT/stargazers "Stars"
-[Scripts]: https://github.com/Nexterr/simpleTV-scripts "скрипты: видео | скраперы | дополнения"
+[Issues]: ../../../simpleTV-script-YT/issues "Issues"
+[Forks]: ../../../simpleTV-script-YT/network/members "Forks"
+[Stars]: ../../../simpleTV-script-YT/stargazers "Stars"
+[Scripts]: ../../../simpleTV-scripts "скрипты: видео | скраперы | дополнения"
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
-[License]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
-[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "удалить несовместимые и неактуальные скрипты"
+[License]: ../../../simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
+[remove]: ../../../simpleTV-scripts/tree/master/addons/remove-illegal-scripts "удалить несовместимые и неактуальные скрипты"
 [simpleTV homepage]: http://iptv.gen12.net "домашняя страница"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "багтрекер"
-[EN]: https://github.com/Nexterr/simpleTV-script-YT/blob/main/README-EN.md "english"
+[EN]: ../../../simpleTV-script-YT/blob/main/README-EN.md "english"
 
 [badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT.svg?style=flat-square "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT.svg?style=flat-square "Forks"
