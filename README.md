@@ -41,7 +41,7 @@
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
 [License]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
-[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "remove ilegal scripts"
+[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "удалить несовместимые и неактуальные скрипты"
 [simpleTV homepage]: http://iptv.gen12.net "simpleTV homepage"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "simpleTV bugtracker"
 [EN]: https://github.com/Nexterr/simpleTV-script-YT/blob/main/README-EN.md "english"
