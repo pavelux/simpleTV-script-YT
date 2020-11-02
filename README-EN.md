@@ -48,7 +48,7 @@
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "simpleTV bugtracker"
 [RU]: ../../ "русский"
 
-[badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT?color=%232b2b2b "Open issues"
+[badge-issues]: https://img.shields.io/github/issues-raw/Nexterr/simpleTV-script-YT?color=%232b2b2b "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT?color=%232b2b2b "Forks"
 [badge-stars]: https://img.shields.io/github/stars/Nexterr/simpleTV-script-YT?color=%232b2b2b "Stars"
 [badge-scripts]: https://img.shields.io/badge/scripts-videos%20%7C%20scrapers%20%7C%20addons-%232b2b2b?style=flat-square "scripts: videos | scrapers | addons"
