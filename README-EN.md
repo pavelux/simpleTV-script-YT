@@ -1,5 +1,5 @@
 <p align="right">
- <a title="русский" href="https://github.com/Nexterr/simpleTV-script-YT"><img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/ru.png" alt="русский"  /> </a><strong ><sup><sub>RU</sub></sup></strong>
+ <a title="русский" href="../../../simpleTV-script-YT"><img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/ru.png" alt="русский"  /> </a><strong ><sup><sub>RU</sub></sup></strong>
 </p>
 
 [![Issues][badge-issues]][Issues]
@@ -36,17 +36,17 @@
 - use **[remove-illegal-scripts][remove]**
 ---------------------------------------------
 
-[Issues]: https://github.com/Nexterr/simpleTV-script-YT/issues "Issues"
-[Forks]: https://github.com/Nexterr/simpleTV-script-YT/network/members "Forks"
-[Stars]: https://github.com/Nexterr/simpleTV-script-YT/stargazers "Stars"
-[Scripts]: https://github.com/Nexterr/simpleTV-scripts "Scripts"
+[Issues]: ../../../simpleTV-script-YT/issues "Issues"
+[Forks]: ../../../simpleTV-script-YT/network/members "Forks"
+[Stars]: ../../../simpleTV-script-YT/stargazers "Stars"
+[Scripts]: ../../../simpleTV-scripts "Scripts"
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
-[License]: https://github.com/Nexterr/simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
-[remove]: https://github.com/Nexterr/simpleTV-scripts/tree/master/addons/remove-illegal-scripts "remove ilegal scripts"
+[License]: ../../../simpleTV-script-YT/blob/master/LICENSE "License Apache 2.0"
+[remove]: ../../../simpleTV-scripts/tree/master/addons/remove-illegal-scripts "remove ilegal scripts"
 [simpleTV homepage]: http://iptv.gen12.net "simpleTV homepage"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "simpleTV bugtracker"
-[RU]: https://github.com/Nexterr/simpleTV-script-YT "русский"
+[RU]: ../../../simpleTV-script-YT "русский"
 
 [badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT.svg?style=flat-square "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT.svg?style=flat-square "Forks"
