@@ -49,7 +49,7 @@
 [badge-issues]: https://img.shields.io/github/issues/Nexterr/simpleTV-script-YT.svg?style=flat-square "Open issues"
 [badge-forks]: https://img.shields.io/github/forks/Nexterr/simpleTV-script-YT.svg?style=flat-square "Forks"
 [badge-stars]: https://img.shields.io/github/stars/Nexterr/simpleTV-script-YT.svg?style=flat-square "Stars"
-[badge-scripts]: https://img.shields.io/badge/%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D1%8B-videos%20%7C%20scrapers%20%7C%20addons-%2300008b?style=flat-square "scripts: videos | scrapers | addons"
+[badge-scripts]: https://img.shields.io/badge/%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D1%8B-%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%20%7C%20%D1%81%D0%BA%D1%80%D0%B0%D0%BF%D0%B5%D1%80%D1%8B%20%7C%20%D0%B4%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F-%2300008b?style=flat-square "скрипты: видео | скраперы | дополнения"
 [badge-simpletvapi]: https://img.shields.io/badge/simpleTV-Lua%20API-maroon?style=flat-square "simpleTV Lua API"
 [badge-lua]: https://img.shields.io/badge/Lua-5.1-blueviolet?style=flat-square "Lua 5.1"
 [badge-license]: https://img.shields.io/badge/License-Apache%202.0-blueviolet?style=flat-square "License Apache 2.0"
