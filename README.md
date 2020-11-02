@@ -53,5 +53,5 @@
 [badge-simpletvapi]: https://img.shields.io/badge/simpleTV-Lua%20API-maroon?style=flat-square "simpleTV Lua API"
 [badge-lua]: https://img.shields.io/badge/Lua-5.1-blueviolet?style=flat-square "Lua 5.1"
 [badge-license]: https://img.shields.io/badge/License-Apache%202.0-blueviolet?style=flat-square "License Apache 2.0"
-[badge-simpletvhomepage]: https://img.shields.io/badge/simpleTV-homepage-maroon?style=flat-square "simpleTV homepage"
-[badge-simpletvbugtracker]: https://img.shields.io/badge/simpleTV-bugtracker-maroon?style=flat-square "simpleTV bugtracker"
+[badge-simpletvhomepage]: https://img.shields.io/badge/simpleTV-homepage-maroon?style=flat-square "домашняя страница"
+[badge-simpletvbugtracker]: https://img.shields.io/badge/simpleTV-bugtracker-maroon?style=flat-square "багтрекер"
