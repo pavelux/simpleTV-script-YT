@@ -1,4 +1,6 @@
- ###### **[:uk: EN][EN]**
+<p align="right">
+ <a title="english" href="https://github.com/Nexterr/simpleTV-script-YT/blob/main/README-EN.md"><img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/gb.png" alt="english" width="32" height="16" /> </a><strong ><sup><sub>EN</sub></sup></strong>
+</p>
 
 [![Issues][badge-issues]][Issues]
 [![Forks][badge-forks]][Forks]
