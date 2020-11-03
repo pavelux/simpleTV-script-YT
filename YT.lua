@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (31/10/20)
+-- видеоскрипт для сайта https://www.youtube.com (3/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,14 +38,7 @@ local infoInFile = false
 	require 'asynPlsLoaderHelper'
 	local inAdr = m_simpleTV.Control.CurrentAddress
 	local urlAdr = inAdr
-	if inAdr:match('https?://')
-		and not (inAdr:match('&isChPlst=')
-			or inAdr:match('&isPlst=')
-			or inAdr:match('browse_ajax')
-			or inAdr:match('&isLogo=')
-			or inAdr:match('&restart')
-			or inAdr:match('&mix='))
-	then
+	local function cleanUrl(inAdr)
 		if not m_simpleTV.Common.isUTF8(inAdr) then
 			inAdr = m_simpleTV.Common.multiByteToUTF8(inAdr)
 		end
@@ -70,7 +63,7 @@ local infoInFile = false
 		inAdr = inAdr:gsub('//gaming%.', '//www.')
 		inAdr = inAdr:gsub('/featured%?*', '')
 		inAdr = inAdr:gsub('&nohtml5=%w+', '')
-		inAdr = inAdr:gsub('&feature=%w+', '')
+		inAdr = inAdr:gsub('&feature=[^&]*', '')
 		inAdr = inAdr:gsub('&playnext=%w+', '')
 		inAdr = inAdr:gsub('/tv%#/.-%?', '/watch?')
 		inAdr = inAdr:gsub('&resume', '')
@@ -87,6 +80,18 @@ local infoInFile = false
 			inAdr = inAdr:gsub('^https://.-(/.+)', 'https://www.youtube.com%1')
 		end
 		inAdr = inAdr:gsub('^https://youtube%.com', 'https://www.youtube.com')
+		inAdr = inAdr:gsub('^.-/playlist%?list=RD(.-)$', 'https://www.youtube.com/watch?v=%1&list=RD%1')
+	 return inAdr
+	end
+	if inAdr:match('https?://')
+		and not (inAdr:match('&isChPlst=')
+			or inAdr:match('&isPlst=')
+			or inAdr:match('browse_ajax')
+			or inAdr:match('&isLogo=')
+			or inAdr:match('&restart')
+			or inAdr:match('&mix='))
+	then
+		inAdr = cleanUrl(inAdr)
 	end
 	if not m_simpleTV.User then
 		m_simpleTV.User = {}
