@@ -14,18 +14,19 @@
 [![Lua][badge-lua]][Lua]
 [![License][badge-license]][License]
 
-<div class="table sectionedit1">
-<table class="inline" style="height: 107px;" width="586">
-<tbody>
-<tr class="row0">
-<th class="col0" ><a href="http://iptv.gen12.net/"><img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/logo_f1.png" width="100px" alt="simpleTV homepage" title="simpleTV homepage" /></a></th>
-<th class="col1 rightalign" " colspan="3">
-<h2 style="text-align: left;"><strong class="">Скрипт YT для IPTV плеера simpleTV</strong></h2><p>0.5.0 b12.7.5 (x32/x64 vlc 3.0.11)</p>
-</th>
-</tr>
-</tbody>
+<table width="100%">
+  <tr>
+    <td>
+      <a href="http://iptv.gen12.net">
+        <img src="https://raw.githubusercontent.com/Nexterr/simpleTV-images/master/logo_f1.png" 
+            title="домашняя страница" alt="simpleTV homepage" width="70"/>
+      </a>
+    </td>
+    <td>
+    <h3>Скрипт YT для IPTV плеера simpleTV</h3>
+    <p align="center">0.5.0 b12.7.5 (x32/x64 vlc 3.0.11)</p>
+  </tr>
 </table>
-</div>
 
 ###### кодировка UTF-8 without BOM
 ---------------------------------------------
