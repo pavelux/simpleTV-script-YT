@@ -80,7 +80,10 @@ local infoInFile = false
 			inAdr = inAdr:gsub('^https://.-(/.+)', 'https://www.youtube.com%1')
 		end
 		inAdr = inAdr:gsub('^https://youtube%.com', 'https://www.youtube.com')
-		inAdr = inAdr:gsub('^.-/playlist%?list=RD(.-)$', 'https://www.youtube.com/watch?v=%1&list=RD%1')
+		local id = inAdr:match('/playlist%?list=RD([^&]*)')
+		if id and #id == 11 then
+			inAdr = inAdr:gsub('/playlist%?list=RD[^&]*', '/watch?v='.. id .. '&list=RD' .. id)
+		end
 	 return inAdr
 	end
 	if inAdr:match('https?://')
