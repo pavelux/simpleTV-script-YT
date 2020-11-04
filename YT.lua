@@ -2428,10 +2428,10 @@ https://github.com/grafi-tt/lunaJson
 	end
 	local function Videos_rss_videos(str, tab, typePlst, i)
 		local name, published, adr, desc, panelDescName
-			for gg in str:gmatch('<entry>.-</entry>') do
-				name = gg:match('<title>([^<]+)')
-				adr = gg:match('<yt:videoId>([^<]+)')
-				published = gg:match('<published>([^<]+)')
+			for g in str:gmatch('<entry>.-</entry>') do
+				name = g:match('<title>([^<]+)')
+				adr = g:match('<yt:videoId>([^<]+)')
+				published = g:match('<published>([^<]+)')
 				if name and adr and published then
 					tab[i] = {}
 					tab[i].Id = i
@@ -2449,7 +2449,7 @@ https://github.com/grafi-tt/lunaJson
 						tab[i].InfoPanelLogo = string.format('https://i.ytimg.com/vi/%s/default.jpg', adr)
 						tab[i].InfoPanelShowTime = 10000
 						panelDescName = nil
-						desc = gg:match('<media:description>([^<]+)')
+						desc = g:match('<media:description>([^<]+)')
 						tab[i].InfoPanelDesc = desc_html(desc, tab[i].InfoPanelLogo, name, tab[i].Address)
 						if desc and desc ~= '' then
 							panelDescName = m_simpleTV.User.YT.Lng.desc
@@ -2463,14 +2463,17 @@ https://github.com/grafi-tt/lunaJson
 	 return ret
 	end
 	local function Videos_plst(str, tab, typePlst, i)
-		local times, count, publis, channel, name, adr, play_all, desc, upcoming, panelDescName
-			for c in str:gmatch('[eod]Renderer".-"thumbnailOverlayNowPlayingRenderer"') do
-				name = c:match('"title":{"runs":%[{"text":"([^"]+)') or c:match('"simpleText":"([^"]+)')
-				adr = c:match('"videoId":"([^"]+)')
-				times = c:match('"thumbnailOverlayTimeStatusRenderer".-"simpleText":"([^"]+)')
-				play_all = c:match('"PLAY_ALL"')
-				upcoming = c:match('"upcomingEventText"')
-				if name and adr and not play_all and not upcoming then
+		local times, count, publis, channel, name, adr, play_all, desc, upcoming, panelDescName, live
+			for g in str:gmatch('[eod]Renderer".-"thumbnailOverlayNowPlayingRenderer"') do
+				name = g:match('"title":{"runs":%[{"text":"([^"]+)') or g:match('"simpleText":"([^"]+)')
+				adr = g:match('"videoId":"([^"]+)')
+				times = g:match('"thumbnailOverlayTimeStatusRenderer".-"simpleText":"([^"]+)')
+				play_all = g:match('"PLAY_ALL"')
+				upcoming = g:match('"upcomingEventText"')
+				if typePlst == 'main' then
+					live = g:match('"BADGE_STYLE_TYPE_LIVE_NOW"')
+				end
+				if name and adr and not (play_all or upcoming or live) then
 					name = title_clean(name)
 					tab[i] = {}
 					tab[i].Id = i
@@ -2485,9 +2488,9 @@ https://github.com/grafi-tt/lunaJson
 							times = m_simpleTV.User.YT.Lng.live
 							tab[i].Name = string.format('%s (%s)', name, times)
 						end
-						count = c:match('"shortViewCountText":{"simpleText":"([^"]+)')
-								or c:match('iewCountText":{"simpleText":"([^"]+)')
-						publis = c:match('"publishedTimeText":{"simpleText":"([^"]+)')
+						count = g:match('"shortViewCountText":{"simpleText":"([^"]+)')
+								or g:match('iewCountText":{"simpleText":"([^"]+)')
+						publis = g:match('"publishedTimeText":{"simpleText":"([^"]+)')
 						if count and publis then
 							count = publis .. ' ◽ ' .. count
 						else
@@ -2498,14 +2501,14 @@ https://github.com/grafi-tt/lunaJson
 						else
 							count = ''
 						end
-						channel = c:match('"shortBylineText":{"runs":%[{"text":"([^"]+)')
+						channel = g:match('"shortBylineText":{"runs":%[{"text":"([^"]+)')
 						if channel then
 							channel = ' | ' .. title_clean(channel)
 						else
 							channel = ''
 						end
-						desc = c:match('"descriptionSnippet":{"runs":%[{"text":"([^"]+)')
-								or c:match('"descriptionSnippet":{"simpleText":"([^"]+)')
+						desc = g:match('"descriptionSnippet":{"runs":%[{"text":"([^"]+)')
+								or g:match('"descriptionSnippet":{"simpleText":"([^"]+)')
 						if desc and desc ~= '' then
 							panelDescName = m_simpleTV.User.YT.Lng.desc
 						else
@@ -3428,6 +3431,8 @@ https://github.com/grafi-tt/lunaJson
 			params.User.typePlst = 'rss_channels'
 		elseif url:match('/feeds/videos%.xml') then
 			params.User.typePlst = 'rss_videos'
+		elseif url:match('youtube%.com$') then
+			params.User.typePlst = 'main'
 		else
 			params.User.typePlst = 'true'
 		end
