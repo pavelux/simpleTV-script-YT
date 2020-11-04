@@ -3022,15 +3022,7 @@ https://github.com/grafi-tt/lunaJson
 		or inAdr:match('list=TL'))
 		and not inAdr:match('/embed'))
 	then
-		local id = inAdr:match('&list=RD([^&]*)')
-		if id and #id > 15 then
-			inAdr = 'https://www.youtube.com/playlist?list=RD' .. id
-			isChPlst = false
-			isPlstVideos = true
-			plstIndex = 1
-		else
-			inAdr = inAdr .. '&index=1'
-		end
+		inAdr = inAdr .. '&index=1'
 	end
 	if not inAdr:match('index=')
 		and (inAdr:match('list=WL')
