@@ -1164,11 +1164,11 @@ https://github.com/grafi-tt/lunaJson
 		removeElement('YT_DIV_CR')
 	end
 	local function StopOnErr(e, t)
-		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
+			if urlAdr:match('PARAMS=psevdotv') then return end
 		if session then
 			m_simpleTV.Http.Close(session)
 		end
-			if urlAdr:match('PARAMS=psevdotv') then return end
+		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
 		local err
 		if m_simpleTV.User.YT.isAuth
 			and (inAdr:match('list=WL')
