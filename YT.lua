@@ -415,18 +415,16 @@ local infoInFile = false
 			end
 		local cookies = GetNetscapeFileFormat()
 		if cookies then
-			local VISITOR_INFO1_LIVE = cookies:match(';VISITOR_INFO1_LIVE=.-;')
 			local LOGIN_INFO = cookies:match(';LOGIN_INFO=.-;')
 			local SID = cookies:match(';SID=.-;')
 			local HSID = cookies:match(';HSID=.-;')
 			local SSID = cookies:match(';SSID=.-;')
-			if VISITOR_INFO1_LIVE
-				and LOGIN_INFO
+			if LOGIN_INFO
 				and SID
 				and HSID
 				and SSID
 			then
-				cookies = VISITOR_INFO1_LIVE .. LOGIN_INFO .. SID .. HSID .. SSID
+				cookies = 'VISITOR_INFO1_LIVE=' .. LOGIN_INFO .. SID .. HSID .. SSID
 				m_simpleTV.User.YT.isAuth = true
 			else
 				cookies = nil
@@ -454,7 +452,7 @@ local infoInFile = false
 	end
 	local function ShowMessage(m, id)
 		id = id or 'channelName'
-		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 5, id = id})
+		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 8, id = id})
 	end
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
 --[[The MIT License (MIT)
@@ -1166,12 +1164,26 @@ https://github.com/grafi-tt/lunaJson
 		removeElement('YT_DIV_CR')
 	end
 	local function StopOnErr(e, t)
-			if urlAdr:match('PARAMS=psevdotv') then return end
 		m_simpleTV.Control.CurrentAddress = m_simpleTV.User.YT.logoDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
 		if session then
 			m_simpleTV.Http.Close(session)
 		end
-		local err = '❗️ YouTube ' .. m_simpleTV.User.YT.Lng.error .. ' [' .. e .. ']\n' .. (t or '')
+			if urlAdr:match('PARAMS=psevdotv') then return end
+		local err
+		if m_simpleTV.User.YT.isAuth
+			and (inAdr:match('list=WL')
+			or inAdr:match('/shared%?ci=')
+			or inAdr:match('list=LL')
+			or inAdr:match('list=LM')
+			or (inAdr:match('/feed/')
+			and not inAdr:match('/feed/storefront')
+			and not inAdr:match('/feed/trending')))
+		then
+			err = '⚠️ ' .. m_simpleTV.User.YT.Lng.noCookies
+			m_simpleTV.Control.ExecuteAction(11)
+		else
+			err = '❗️ YouTube ' .. m_simpleTV.User.YT.Lng.error .. ' [' .. e .. ']\n' .. (t or '')
+		end
 		ShowMessage(err, 'YT')
 		err = err:gsub('%c.-$', '')
 		m_simpleTV.Control.SetTitle(err)
