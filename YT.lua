@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (4/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (5/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -3619,11 +3619,11 @@ https://github.com/grafi-tt/lunaJson
 			answer = answer:gsub('\\"', '%%22')
 			local tab, i = {}, 1
 			local name, selected, timer, adr, panelDescName
-				for gg in answer:gmatch('{"playlistPanelVideoRenderer":{"title".-%]}}') do
-					name = gg:match('"title".-"simpleText":"([^"]+)')
-					selected = gg:match('"selected":(%a+)')
-					timer = gg:match('"label".-"simpleText":"(%d+:.-)"') or ''
-					adr = gg:match('"videoId":"([^"]+)')
+				for g in answer:gmatch('{"playlistPanelVideoRenderer":{"title".-%]}}') do
+					name = g:match('"title".-"simpleText":"([^"]+)')
+					selected = g:match('"selected":(%a+)')
+					timer = g:match('"label".-"simpleText":"(%d+:.-)"') or ''
+					adr = g:match('"videoId":"([^"]+)')
 					if name and adr then
 						tab[i] = {}
 						tab[i].Id = i
@@ -3653,10 +3653,10 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 				if i == 1 then
-					for gg in answer:gmatch('{"playlistVideoRenderer":{"videoId".-%]}}') do
-						name = gg:match('"title".-"text":"([^"]+)')
-						timer = gg:match('"lengthText".-"simpleText":"(%d+:.-)"') or ''
-						adr = gg:match('"videoId":"([^"]+)')
+					for g in answer:gmatch('{"playlistVideoRenderer":{"videoId".-%]}}') do
+						name = g:match('"title".-"text":"([^"]+)')
+						timer = g:match('"lengthText".-"simpleText":"(%d+:.-)"') or ''
+						adr = g:match('"videoId":"([^"]+)')
 						if name and adr then
 							name = title_clean(name)
 							tab[i] = {}
@@ -3712,9 +3712,19 @@ https://github.com/grafi-tt/lunaJson
 				pl = 32
 			end
 			local vId, ButtonScript1
+			tab.ExtParams = {}
 			if plstId:match('^RD') and plstIndex == 1 then
 				vId = tab[1].Address:match('watch%?v=([^&]+)')
 				pl = 0
+				if inAdr:match('&restart') then
+					if #tab > 2 then
+						plstIndex = math.random(3, #tab)
+					end
+					pl = 32
+					tab.ExtParams.Random = 1
+					tab.ExtParams.PlayMode = 1
+					vId = tab[plstIndex].Address:match('watch%?v=([^&]+)')
+				end
 			else
 				plstIndex = plstPos or 1
 				vId = tab[plstIndex].Address:match('watch%?v=([^&]+)')
@@ -3755,7 +3765,6 @@ https://github.com/grafi-tt/lunaJson
 				AutoNumberFormat = ''
 			end
 			local retAdr
-			tab.ExtParams = {}
 			tab.ExtParams.FilterType = FilterType
 			tab.ExtParams.AutoNumberFormat = AutoNumberFormat
 			tab.ExtParams.LuaOnCancelFunName = 'OnMultiAddressCancel_YT'
@@ -3763,6 +3772,7 @@ https://github.com/grafi-tt/lunaJson
 			tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 			if #tab > 1
 				and plstIndex == 1
+				and not (inAdr:match('&restart') and plstId:match('^RD'))
 			then
 				m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 				m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
