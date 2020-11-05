@@ -410,27 +410,23 @@ local infoInFile = false
 						end
 					end
 				fhandle:close()
-					if i == 1 then return end
+					if #t == 0 then return end
 			 return ';' .. table.concat(t, ';') .. ';'
 			end
 		local cookies = GetNetscapeFileFormat()
 		if cookies then
 			local VISITOR_INFO1_LIVE = cookies:match(';VISITOR_INFO1_LIVE=.-;')
+			local LOGIN_INFO = cookies:match(';LOGIN_INFO=.-;')
 			local SID = cookies:match(';SID=.-;')
 			local HSID = cookies:match(';HSID=.-;')
 			local SSID = cookies:match(';SSID=.-;')
-			local APISID = cookies:match(';APISID=.-;')
-			local LOGIN_INFO = cookies:match(';LOGIN_INFO=.-;')
-			local YSC = cookies:match(';YSC=.-;')
 			if VISITOR_INFO1_LIVE
+				and LOGIN_INFO
 				and SID
 				and HSID
 				and SSID
-				and APISID
-				and LOGIN_INFO
-				and YSC
 			then
-				cookies = VISITOR_INFO1_LIVE .. SID .. HSID .. SSID .. APISID .. LOGIN_INFO .. YSC
+				cookies = VISITOR_INFO1_LIVE .. LOGIN_INFO .. SID .. HSID .. SSID
 				m_simpleTV.User.YT.isAuth = true
 			else
 				cookies = nil
