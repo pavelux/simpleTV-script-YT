@@ -1884,13 +1884,8 @@ https://github.com/grafi-tt/lunaJson
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
 				and (tab.videoDetails.isLiveContent == true or tab.videoDetails.isLive == true)
 			then
-				local opt
-				if m_simpleTV.Common.GetVlcVersion() > 3000 then
-					opt = '$OPT:adaptive-use-access'
-				else
-					opt = '$OPT:no-ts-trust-pcr'
-				end
-				rc, answer = m_simpleTV.Http.Request(session, {url = tab.streamingData.hlsManifestUrl})
+				local extOpt = '$OPT:adaptive-use-access'
+				local rc, answer = m_simpleTV.Http.Request(session, {url = tab.streamingData.hlsManifestUrl})
 				m_simpleTV.Http.Close(session)
 					if rc ~= 200 then
 					 return nil, 'GetStreamsTab live Error 1'
@@ -1908,21 +1903,19 @@ https://github.com/grafi-tt/lunaJson
 							t[i] = {}
 							t[i].Id = i
 							t[i].Name = name .. 'p' .. fps
-							t[i].Address = adr .. opt
+							t[i].Address = adr .. extOpt
 							t[i].qltyLive = qlty
 							i = i + 1
 						end
 					end
-					if i == 1 then
+					if #t == 0 then
 					 return nil, 'GetStreamsTab live Error 2'
 					end
-				if m_simpleTV.Common.GetVlcVersion() > 3000 then
-					t[#t + 1] = {}
-					t[#t].Id = #t
-					t[#t].qltyLive = 10000
-					t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-					t[#t].Address = tab.streamingData.hlsManifestUrl .. opt
-				end
+				t[#t + 1] = {}
+				t[#t].Id = #t
+				t[#t].qltyLive = 10000
+				t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+				t[#t].Address = tab.streamingData.hlsManifestUrl .. extOpt
 				if tab.videoDetails.isLive == true then
 					title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
 				end
@@ -2024,10 +2017,8 @@ https://github.com/grafi-tt/lunaJson
 			 return stream_tab_err, title_err
 			end
 		local captions, captions_title
-		local audio_itags, video_itags, opt_2xx, opt_3xx, opt_3xx_demux_avcodec
 		local audioAdr, audioItag, audioAdr_isCipher, audioAdrName, audioId, audioItag_opus, audioAdr_opus
-		if m_simpleTV.Common.GetVlcVersion() > 3000 then
-			video_itags = {
+		local video_itags = {
 							394, 17, 160, 278, -- 144
 							395, 36, 133, 242, -- 240
 							43, 18, 134, 243, -- 360
@@ -2042,22 +2033,12 @@ https://github.com/grafi-tt/lunaJson
 							266, 313, 315, 337, -- 2160 (60 fps, HDR)
 							272, -- 4320 (60 | 30 fps)
 							}
-			audio_itags = {
+		local audio_itags = {
 							258, -- aac
 							251, -- opus
 							141, -- aac
 							140, -- m4a
 							}
-			opt_3xx = ''
-		else
-			video_itags = {
-							17, -- 144
-							36, -- 240
-							43, 18, -- 360
-							22, -- 720 mp4
-							}
-			opt_2xx = '$OPT:demux=avcodec'
-		end
 		if tab.captions
 			and tab.captions.playerCaptionsTracklistRenderer
 			and tab.captions.playerCaptionsTracklistRenderer.captionTracks
@@ -2144,9 +2125,6 @@ https://github.com/grafi-tt/lunaJson
 				 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 				end
 			captions, captions_title = Subtitle()
-			if captions and m_simpleTV.Common.GetVlcVersion() < 3000 then
-				captions = captions:gsub('://', '/subtitle://')
-			end
 		end
 			for i = 1, #t do
 				t[i].qlty = tonumber(t[i].qlty or '0')
@@ -2196,7 +2174,6 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		if m_simpleTV.Common.GetVlcVersion() > 3000 then
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
@@ -2211,7 +2188,6 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		end
 		local sort_video_itags, u = {}, 1
 			for i = 1, #video_itags do
 				for z = 1, #t do
@@ -2234,42 +2210,39 @@ https://github.com/grafi-tt/lunaJson
 				end
 			end
 		t, u = {}, 1
-		local opt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-		local audioAdrUrl, audioItagUrl
+		local extOpt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
+		local extOpt_demux, adr_audio, itag_audio
 			for _, v in pairs(sort_video) do
 				if v.qlty > 300 then
 					if v.isAdaptive == true and (audioAdr or audioAdr_opus) then
-						if m_simpleTV.Common.GetVlcVersion() > 3000 then
-							if audioAdr
-								and (v.qlty > 1080
-								or (v.itag == 302 or v.itag == 334)
-								or not captions)
-							then
-								opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
-								audioAdrUrl = audioAdr
-								audioItagUrl = audioItag
-							else
-								audioAdrUrl = audioAdr_opus or audioAdr
-								audioItagUrl = audioItag_opus or audioItag
-							end
+						if audioAdr
+							and (v.qlty > 1080
+							or (v.itag == 302 or v.itag == 334)
+							or not captions)
+						then
+							extOpt_demux = '$OPT:demux=avcodec,any'
+							adr_audio = audioAdr
+							itag_audio = audioItag
+						else
+							adr_audio = audioAdr_opus or audioAdr
+							itag_audio = audioItag_opus or audioItag
 						end
 						t[u] = v
+						t[u].audioItag = itag_audio
 						t[u].Address = GetAdr(v.Address, v.isCipher)
 									.. (sTime or '')
-									.. opt_3xx
-									.. (opt_3xx_demux_avcodec or '')
-									.. opt
-									.. audioAdrUrl
+									.. (extOpt_demux or '')
+									.. extOpt
+									.. adr_audio
 									.. (captions or '')
-						t[u].audioItag = audioItagUrl
 						u = u + 1
 					end
 					if v.isAdaptive == false then
 						t[u] = v
+						t[u].audioItag = itag_audio
 						t[u].Address = GetAdr(v.Address, v.isCipher)
 									.. (sTime or '')
-									.. (opt_3xx or opt_2xx)
-									.. opt
+									.. extOpt
 									.. (captions or '')
 						u = u + 1
 					end
@@ -2278,22 +2251,32 @@ https://github.com/grafi-tt/lunaJson
 		if #t == 0 then
 			for _, v in pairs(sort_video) do
 				if v.isAdaptive == true and (audioAdr or audioAdr_opus) then
+					if audioAdr
+						and not captions
+					then
+						extOpt_demux = '$OPT:demux=avcodec,any'
+						adr_audio = audioAdr
+						itag_audio = audioItag
+					else
+						adr_audio = audioAdr_opus or audioAdr
+						itag_audio = audioItag_opus or audioItag
+					end
 					t[u] = v
+					t[u].audioItag = itag_audio
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-								.. (sTime or '')
-								.. opt_3xx
-								.. opt
-								.. (audioAdr_opus or audioAdr)
-								.. (captions or '')
-					t[u].audioItag = audioItag_opus or audioItag
+									.. (sTime or '')
+									.. (extOpt_demux or '')
+									.. extOpt
+									.. adr_audio
+									.. (captions or '')
 					u = u + 1
 				end
 				if v.isAdaptive == false then
 					t[u] = v
+					t[u].audioItag = itag_audio
 					t[u].Address = GetAdr(v.Address, v.isCipher)
 								.. (sTime or '')
-								.. (opt_3xx or opt_2xx)
-								.. opt
+								.. extOpt
 								.. (captions or '')
 					u = u + 1
 				end
@@ -2304,15 +2287,18 @@ https://github.com/grafi-tt/lunaJson
 			 return nil, 'GetStreamsTab Error 2'
 			end
 		if audioAdr_opus or audioAdr then
-			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. (opt_2xx or '') .. (opt_3xx or '') .. '$OPT:NO-STIMESHIFT'
+			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
+			if infoInFile then
+				itag_audio = audioAdr:match('itag=(%d+)')
+			end
 		else
 			audioAdr = 'vlc://pause:5'
 			audioAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher}
+		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher, audioItag = itag_audio}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
@@ -2880,7 +2866,9 @@ https://github.com/grafi-tt/lunaJson
 		end
 		m_simpleTV.Control.ExecuteAction(36)
 	end
-		if m_simpleTV.Common.GetVersion() < 870 then
+		if m_simpleTV.Common.GetVersion() < 870
+			or m_simpleTV.Common.GetVlcVersion() < 3000
+		then
 			m_simpleTV.Http.Close(session)
 			m_simpleTV.Control.ExecuteAction(147)
 			ShowInfo(m_simpleTV.User.YT.Lng.oldVersion, 0xFF990000)
