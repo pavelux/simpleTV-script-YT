@@ -2202,8 +2202,10 @@ https://github.com/grafi-tt/lunaJson
 					if audio_itags[i] == t[z].itag then
 						audioAdr_isCipher = t[z].isCipher
 						if audio_itags[i] == 251 then
-							audioAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
-							audioItag_opus = t[z].itag
+							if captions then
+								audioAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
+								audioItag_opus = t[z].itag
+							end
 						elseif not audioAdr then
 							audioAdr = GetAdr(t[z].Address, t[z].isCipher)
 							audioItag = t[z].itag
@@ -2303,7 +2305,7 @@ https://github.com/grafi-tt/lunaJson
 			 return nil, 'GetStreamsTab Error 2'
 			end
 		if audioAdr then
-			audioAdr = audioAdr .. (sTime or '') .. (opt_2xx or '') .. (opt_3xx or '') .. '$OPT:NO-STIMESHIFT'
+			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. (opt_2xx or '') .. (opt_3xx or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 		else
