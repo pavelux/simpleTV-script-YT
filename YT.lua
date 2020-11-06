@@ -1195,18 +1195,18 @@ https://github.com/grafi-tt/lunaJson
 			types = 'channel'
 			header = m_simpleTV.User.YT.Lng.channel
 			yt = 'channel/'
-			stopSearch = 90
+			stopSearch = 120
 		elseif sAdr:match('^%s*%-%s*%-') then
 			types = 'playlist'
 			header = m_simpleTV.User.YT.Lng.plst
 			yt = 'playlist?list='
-			stopSearch = 120
+			stopSearch = 150
 		elseif sAdr:match('^%s*%-%s*%+') then
 			eventType = '&eventType=live'
 			types = 'video'
 			header = m_simpleTV.User.YT.Lng.live
 			yt = 'watch?v='
-			stopSearch = 60
+			stopSearch = 90
 		elseif sAdr:match('^%-related=') then
 			sAdr = sAdr:gsub('%-related=', '')
 			types = 'related'
@@ -1217,7 +1217,7 @@ https://github.com/grafi-tt/lunaJson
 			types = 'video&videoDimension=2d'
 			header = m_simpleTV.User.YT.Lng.video
 			yt = 'watch?v='
-			stopSearch = 50
+			stopSearch = 90
 		end
 			if types == 'video&videoDimension=2d' then
 				sAdr = sAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
@@ -1229,13 +1229,14 @@ https://github.com/grafi-tt/lunaJson
 					for j = 1, 10 do
 							if k > stopSearch then break end
 						url = 'https://youtube.com/search_ajax?style=json&search_query=' .. sAdr .. '&page=' .. j .. '&hl=' .. m_simpleTV.User.YT.Lng.hl
+						m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
 						local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = 'X-YouTube-Client-Name: 56\nX-YouTube-Client-Version: 20200911\nReferer: https://www.youtube.com/'})
 							if rc ~= 200 then break end
 						err, tab = pcall(lunaJson_decode, answer)
 							if err == false then return end
 						i = 1
 							while true do
-									if not tab.video[i] then break end
+									if not tab.video[i] or k > stopSearch then break end
 								length_seconds = tonumber(tab.video[i].length_seconds or '0')
 								if length_seconds > 0 then
 									name = title_clean(tab.video[i].title)
@@ -1279,63 +1280,17 @@ https://github.com/grafi-tt/lunaJson
 			sAdr = m_simpleTV.Common.toPercentEncoding(sAdr)
 			url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' .. sAdr .. '&type=' .. types .. '&fields=nextPageToken,items/id,items/snippet/title,items/snippet/thumbnails/default/url,items/snippet/description,items/snippet/liveBroadcastContent,items/snippet/channelTitle&maxResults=50' .. eventType .. '&key=' .. m_simpleTV.User.YT.apiKey .. '&relevanceLanguage=' .. m_simpleTV.User.YT.Lng.hl
 		end
-		local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = m_simpleTV.User.YT.apiKeyHeader})
-			if rc ~= 200 then return end
-		local err, tab = pcall(lunaJson_decode, answer)
-			if err == false then return end
 		local t = {}
 		local k, i = 1, 1
-		local name, desc, panelDescName, err
-			while true do
-					if not tab.items[i] or k > stopSearch then break end
-				if eventType == '&eventType=live'
-					or (eventType == '' and tab.items[i].snippet.liveBroadcastContent ~= 'live')
-				then
-					name = title_clean(tab.items[i].snippet.title)
-					t[k] = {}
-					t[k].Id = k
-					t[k].Name = name
-					t[k].Address = 'https://www.youtube.com/' .. yt .. (tab.items[i].id.videoId or tab.items[i].id.playlistId or tab.items[i].id.channelId)
-					if isInfoPanel == true then
-						if tab.items[i].snippet
-							and tab.items[i].snippet.thumbnails
-							and tab.items[i].snippet.thumbnails.default
-							and tab.items[i].snippet.thumbnails.default.url
-						then
-							t[k].InfoPanelLogo = tab.items[i].snippet.thumbnails.default.url
-						else
-							t[k].InfoPanelLogo = m_simpleTV.User.YT.logoDisk
-						end
-						t[k].InfoPanelName = name
-						t[k].InfoPanelShowTime = 10000
-						desc = tab.items[i].snippet.description
-						panelDescName = nil
-						if desc and desc ~= '' then
-							panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
-						end
-						t[k].InfoPanelDesc = desc_html(desc, t[k].InfoPanelLogo, name, t[k].Address)
-						if tab.items[i].snippet.channelTitle then
-							t[k].InfoPanelTitle = (panelDescName or '')
-												.. m_simpleTV.User.YT.Lng.channel
-												.. ': '
-												.. title_clean(tab.items[i].snippet.channelTitle)
-						end
-					end
-					k = k + 1
-				end
-				i = i + 1
-			end
-			if k == 1 then return end
-		local j, adrUrl, nextPageToken
+		local j, nextPageToken
+		local name, desc, panelDescName
+		local adrUrl = url
 			while true do
 					if k > stopSearch then break end
-				nextPageToken = answer:match('"nextPageToken": "([^"]+)')
-					if not nextPageToken then break end
-				adrUrl = url .. '&pageToken=' .. nextPageToken
-				rc, answer = m_simpleTV.Http.Request(session, {url = adrUrl, headers = m_simpleTV.User.YT.apiKeyHeader})
+				local rc, answer = m_simpleTV.Http.Request(session, {url = adrUrl, headers = m_simpleTV.User.YT.apiKeyHeader})
 					if rc ~= 200 then break end
 					if not answer:match('"id"') then break end
-				err, tab = pcall(lunaJson_decode, answer)
+				local err, tab = pcall(lunaJson_decode, answer)
 					if err == false then return end
 				j = 1
 					while true do
@@ -1376,6 +1331,9 @@ https://github.com/grafi-tt/lunaJson
 						end
 						j = j + 1
 					end
+				nextPageToken = answer:match('"nextPageToken": "([^"]+)')
+					if not nextPageToken then break end
+				adrUrl = url .. '&pageToken=' .. nextPageToken
 			end
 	 return t, types, header
 	end
