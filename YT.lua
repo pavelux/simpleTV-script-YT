@@ -17,7 +17,7 @@
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work' (https://addons.mozilla.org/en-US/firefox/addon/cookies-txt )
 -- показать на OSD плейлист / выбор качества: Ctrl+M
-local infoInFile = false
+local infoInFile = true
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a%.]*youtu[%.combe]')
 			and not m_simpleTV.Control.CurrentAddress:match('^https?://[w%.]*hooktube%.com')
@@ -2077,18 +2077,18 @@ https://github.com/grafi-tt/lunaJson
 							136, 247, -- 720
 							22, -- 720 mp4
 							298, -- 720 (60 fps)
-							-- 302, 334, -- 720 (60 fps, HDR)
+							302, 334, -- 720 (60 fps, HDR)
 							137, 248, -- 1080
-							-- 299, 335, -- 1080 (60 fps, HDR)
+							299, 335, -- 1080 (60 fps, HDR)
 							264, 271, 308, 336, -- 1440 (60 fps, HDR)
 							266, 313, 315, 337, -- 2160 (60 fps, HDR)
-							272, -- 4320 (60 fps)
+							272, -- 4320 (60 | 30 fps)
 							}
 			audio_itags = {
 							258, -- aac
 							141, -- aac
-							251, -- opus
 							140, -- m4a
+							251, -- opus
 							}
 			opt_3xx = ''
 		else
@@ -2280,7 +2280,11 @@ https://github.com/grafi-tt/lunaJson
 				if v.qlty > 300 then
 					if v.isAdaptive == true and audioAdr then
 						if m_simpleTV.Common.GetVlcVersion() > 3000
-							and (v.qlty > 1080 or (m_simpleTV.User.YT.isTrailer and audioItag ~= 251))
+							and (
+								v.qlty > 1080
+								or (m_simpleTV.User.YT.isTrailer and audioItag ~= 251)
+								or (v.itag == 302 or v.itag == 334)
+							)
 						then
 							opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
 						end
@@ -3724,7 +3728,7 @@ https://github.com/grafi-tt/lunaJson
 			if plstId:match('^RD') and plstIndex == 1 then
 				vId = tab[1].Address:match('watch%?v=([^&]+)')
 				pl = 0
-				if inAdr:match('&restart') then
+				if urlAdr:match('&restart&isLogo=false') then
 					if #tab > 2 then
 						plstIndex = math.random(3, #tab)
 					end
@@ -3780,7 +3784,7 @@ https://github.com/grafi-tt/lunaJson
 			tab.ExtParams.LuaOnTimeoutFunName = 'OnMultiAddressCancel_YT'
 			if #tab > 1
 				and plstIndex == 1
-				and not (inAdr:match('&restart') and plstId:match('^RD'))
+				and not (urlAdr:match('&restart&isLogo=false') and plstId:match('^RD'))
 			then
 				m_simpleTV.User.YT.DelayedAddress = tab[1].Address
 				m_simpleTV.OSD.ShowSelect_UTF8(header, 0, tab, 10000, 2)
@@ -3886,7 +3890,11 @@ https://github.com/grafi-tt/lunaJson
 					end
 					m_simpleTV.Http.Close(session)
 					m_simpleTV.Control.ChangeAddress = 'No'
-					m_simpleTV.Control.CurrentAddress = inAdr .. '&restart'
+					inAdr = inAdr .. '&restart'
+					if urlAdr:match('&isLogo=false') then
+						inAdr = inAdr .. '&isLogo=false'
+					end
+					m_simpleTV.Control.CurrentAddress = inAdr
 					dofile(m_simpleTV.MainScriptDir .. 'user\\video\\YT.lua')
 				 return
 				end
