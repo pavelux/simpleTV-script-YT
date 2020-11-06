@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (6/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (7/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -2240,15 +2240,14 @@ https://github.com/grafi-tt/lunaJson
 				if v.qlty > 300 then
 					if v.isAdaptive == true and (audioAdr or audioAdr_opus) then
 						if m_simpleTV.Common.GetVlcVersion() > 3000 then
-							if v.qlty > 1080
+							if audioAdr
+								and (v.qlty > 1080
 								or (v.itag == 302 or v.itag == 334)
-								or not captions
+								or not captions)
 							then
-								if audioAdr then
-									opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
-								end
-								audioAdrUrl = audioAdr or audioAdr_opus
-								audioItagUrl = audioItag or audioItag_opus
+								opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
+								audioAdrUrl = audioAdr
+								audioItagUrl = audioItag
 							else
 								audioAdrUrl = audioAdr_opus or audioAdr
 								audioItagUrl = audioItag_opus or audioItag
