@@ -2202,10 +2202,8 @@ https://github.com/grafi-tt/lunaJson
 					if audio_itags[i] == t[z].itag then
 						audioAdr_isCipher = t[z].isCipher
 						if audio_itags[i] == 251 then
-							if captions then
-								audioAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
-								audioItag_opus = t[z].itag
-							end
+							audioAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
+							audioItag_opus = t[z].itag
 						elseif not audioAdr then
 							audioAdr = GetAdr(t[z].Address, t[z].isCipher)
 							audioItag = t[z].itag
@@ -2246,7 +2244,9 @@ https://github.com/grafi-tt/lunaJson
 								or (v.itag == 302 or v.itag == 334)
 								or not captions
 							then
-								opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
+								if audioAdr then
+									opt_3xx_demux_avcodec = '$OPT:demux=avcodec,any'
+								end
 								audioAdrUrl = audioAdr or audioAdr_opus
 								audioItagUrl = audioItag or audioItag_opus
 							else
@@ -2304,7 +2304,7 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Http.Close(session)
 			 return nil, 'GetStreamsTab Error 2'
 			end
-		if audioAdr then
+		if audioAdr_opus or audioAdr then
 			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. (opt_2xx or '') .. (opt_3xx or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
@@ -2313,7 +2313,7 @@ https://github.com/grafi-tt/lunaJson
 			audioAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[u] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher}
+		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
