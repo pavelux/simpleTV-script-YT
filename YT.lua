@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (7/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (8/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,7 @@ local infoInFile = false
 			or inAdr:match('browse_ajax')
 			or inAdr:match('&isLogo=')
 			or inAdr:match('&restart')
-			or inAdr:match('&mix='))
+			or inAdr:match('&isMix='))
 	then
 		inAdr = cleanUrl(inAdr)
 	end
@@ -2210,55 +2210,21 @@ https://github.com/grafi-tt/lunaJson
 			end
 		t, u = {}, 1
 		local extOpt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-		local extOpt_demux, adr_audio, itag_audio
-			for _, v in pairs(sort_video) do
-				if v.qlty > 300 then
-					if v.isAdaptive == true and (audioAdr or audioAdr_opus) then
-						if audioAdr
-							and (v.qlty > 1080
-							or (v.itag == 302 or v.itag == 334)
-							or not captions)
-						then
-							extOpt_demux = '$OPT:demux=avcodec,any'
-							adr_audio = audioAdr
-							itag_audio = audioItag
-						else
-							adr_audio = audioAdr_opus or audioAdr
-							itag_audio = audioItag_opus or audioItag
-						end
-						t[u] = v
-						t[u].audioItag = itag_audio
-						t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (sTime or '')
-									.. (extOpt_demux or '')
-									.. extOpt
-									.. adr_audio
-									.. (captions or '')
-						u = u + 1
-					end
-					if v.isAdaptive == false then
-						t[u] = v
-						t[u].audioItag = itag_audio
-						t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (sTime or '')
-									.. extOpt
-									.. (captions or '')
-						u = u + 1
-					end
-				end
-			end
-		if #t == 0 then
-			for _, v in pairs(sort_video) do
+		local extOpt_demux, adr_audio, itag_audio, captionsAdr
+			local function streams(v, u)
 				if v.isAdaptive == true and (audioAdr or audioAdr_opus) then
-					if audioAdr
-						and not captions
+					if (audioAdr_opus and captions)
+						and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
 					then
+						adr_audio = audioAdr_opus
+						itag_audio = audioItag_opus
+						captionsAdr = captions
+					else
+							if not audioAdr then return end
 						extOpt_demux = '$OPT:demux=avcodec,any'
 						adr_audio = audioAdr
 						itag_audio = audioItag
-					else
-						adr_audio = audioAdr_opus or audioAdr
-						itag_audio = audioItag_opus or audioItag
+						captionsAdr = nil
 					end
 					t[u] = v
 					t[u].audioItag = itag_audio
@@ -2267,18 +2233,27 @@ https://github.com/grafi-tt/lunaJson
 									.. (extOpt_demux or '')
 									.. extOpt
 									.. adr_audio
-									.. (captions or '')
+									.. (captionsAdr or '')
 					u = u + 1
 				end
 				if v.isAdaptive == false then
 					t[u] = v
-					t[u].audioItag = itag_audio
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-								.. (sTime or '')
-								.. extOpt
-								.. (captions or '')
+									.. (sTime or '')
+									.. extOpt
+									.. (captions or '')
 					u = u + 1
 				end
+			 return t, u
+			end
+			for _, v in pairs(sort_video) do
+				if v.qlty > 300 then
+					v, u = streams(v, u)
+				end
+			end
+		if #t == 0 then
+			for _, v in pairs(sort_video) do
+				v, u = streams(v, u)
 			end
 		end
 			if #t == 0 then
@@ -3205,7 +3180,7 @@ https://github.com/grafi-tt/lunaJson
 					name = title_clean(name)
 					tab[i].Name = j .. '. ' .. name
 					if adr:match('list=RD') then
-						tab[i].Address = string.format('https://www.youtube.com%s&isChPlst=true&mix=true', adr)
+						tab[i].Address = string.format('https://www.youtube.com%s&isChPlst=true&isMix=true', adr)
 					else
 						tab[i].Address = string.format('https://www.youtube.com%s&isChPlst=true', adr)
 					end
@@ -3343,7 +3318,7 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.User.YT.ChPlst.Num = tab[id].Name:match('^(%d+)') or tab[1].Name
 			m_simpleTV.User.YT.ChPlst.Header = tab[id].Name:match('^%d+%. (.+)') or tab[1].Name
 			m_simpleTV.User.YT.ChPlst.Refresh = false
-			if tab[id].Address:match('&mix=')
+			if tab[id].Address:match('&isMix=')
 				or tab[id].Address:match('list=LL')
 			then
 				m_simpleTV.Http.Close(session)
