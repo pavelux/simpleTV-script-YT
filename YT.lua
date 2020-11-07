@@ -452,7 +452,7 @@ local infoInFile = false
 	end
 	local function ShowMessage(m, id)
 		id = id or 'channelName'
-		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 8, id = id})
+		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 6, id = id})
 	end
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
 --[[The MIT License (MIT)
@@ -2017,28 +2017,6 @@ https://github.com/grafi-tt/lunaJson
 			 return stream_tab_err, title_err
 			end
 		local captions, captions_title
-		local audioAdr, audioItag, audioAdr_isCipher, audioAdrName, audioId, audioItag_opus, audioAdr_opus
-		local video_itags = {
-							394, 17, 160, 278, -- 144
-							395, 36, 133, 242, -- 240
-							43, 18, 134, 243, -- 360
-							135, 244, -- 480
-							136, 247, -- 720
-							22, -- 720 mp4
-							298, -- 720 (60 fps)
-							302, 334, -- 720 (60 fps, HDR)
-							137, 248, -- 1080
-							299, 335, -- 1080 (60 fps, HDR)
-							264, 271, 308, 336, -- 1440 (60 fps, HDR)
-							266, 313, 315, 337, -- 2160 (60 fps, HDR)
-							272, -- 4320 (60 | 30 fps)
-							}
-		local audio_itags = {
-							258, -- aac
-							251, -- opus
-							141, -- aac
-							140, -- m4a
-							}
 		if tab.captions
 			and tab.captions.playerCaptionsTracklistRenderer
 			and tab.captions.playerCaptionsTracklistRenderer.captionTracks
@@ -2174,6 +2152,27 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
+		local audioAdr, audioItag, audioAdr_isCipher, audioItag_opus, audioAdr_opus
+		local video_itags = {
+							394, 160, 278, -- 144
+							395, 133, 242, -- 240
+							18, 134, 243, -- 360
+							135, 244, -- 480
+							136, 247, 22, -- 720
+							298, -- 720 (60 fps)
+							302, 334, -- 720 (60 fps, HDR)
+							137, 248, -- 1080
+							299, 335, -- 1080 (60 fps, HDR)
+							271, 308, 336, -- 1440 (60 fps, HDR)
+							313, 315, 337, -- 2160 (60 fps, HDR)
+							272 -- 4320 (60 fps)
+							}
+		local audio_itags = {
+							258, -- MP4 AAC (LC) 384 Kbps Surround (5.1)
+							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
+							141, -- MP4 AAC (LC) 256 Kbps Stereo (2)
+							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
+							}
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
@@ -2286,19 +2285,20 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Http.Close(session)
 			 return nil, 'GetStreamsTab Error 2'
 			end
+		local audioAdrName, audioId, itag_a
 		if audioAdr_opus or audioAdr then
 			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
-				itag_audio = audioAdr:match('itag=(%d+)')
+				itag_a = audioAdr:match('itag=(%d+)')
 			end
 		else
 			audioAdr = 'vlc://pause:5'
 			audioAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher, audioItag = itag_audio}
+		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher, audioItag = itag_a}
 		table.sort(t, function(a, b) return a.qlty < b.qlty end)
 			for i = 1, #t do
 				t[i].Id = i
