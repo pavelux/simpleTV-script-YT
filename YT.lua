@@ -949,6 +949,7 @@ https://github.com/grafi-tt/lunaJson
 		s = s:gsub('%%22', '"')
 		s = s:gsub('\\u0026', '&')
 		s = s:gsub('\\u2060', '')
+		s = s:gsub('\\u200b', '')
 		s = s:gsub('\\n', ' ')
 		s = s:gsub('\\\\', '\\')
 		s = unescape_html(s)
