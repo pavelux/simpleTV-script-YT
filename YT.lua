@@ -3696,12 +3696,15 @@ https://github.com/grafi-tt/lunaJson
 			plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
 			m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
 			if m_simpleTV.Control.MainMode == 0 then
-				plstPicId = plstPicId or tab[1].Address:match('watch%?v=([^&]+)')
-				m_simpleTV.Control.ChangeChannelLogo(m_simpleTV.User.paramScriptForSkin_logoYT
-													or 'https://i.ytimg.com/vi/' .. plstPicId .. '/hqdefault.jpg'
-													, m_simpleTV.Control.ChannelID
-													, 'CHANGE_IF_NOT_EQUAL')
-				m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
+				if not urlAdr:match('isLogo=false') and not urlAdr:match('&restart') then
+					m_simpleTV.Control.ChangeChannelLogo(m_simpleTV.User.paramScriptForSkin_logoYT
+														or 'https://i.ytimg.com/vi/' .. plstPicId .. '/hqdefault.jpg'
+														, m_simpleTV.Control.ChannelID
+														, 'CHANGE_IF_NOT_EQUAL')
+				end
+				if not urlAdr:match('isLogo=false') then
+						m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
+				end
 			end
 			if isInfoPanel == false then
 				title = Title_isInfoPanel_false(title, t[index].Name)
