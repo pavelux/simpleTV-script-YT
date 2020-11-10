@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (9/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (11/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -179,12 +179,12 @@ local infoInFile = false
 	m_simpleTV.Http.SetTimeout(session, 12000)
 	m_simpleTV.User.YT.DelayedAddress = nil
 	m_simpleTV.User.YT.isChapters = false
+	m_simpleTV.User.YT.isVideo = true
 	local inf0
 	local plstId
 	local plstIndex
 	local plstPos
 	local isJsDecode = false
-	local isVideo = true
 	local isPlst = false
 	local isChPlst = false
 	local isPlstVideos = false
@@ -990,7 +990,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		adr = adr:gsub('&is%a+=%a+', '')
 		local link = string.format('<a href="%s" style="color:#154C9C; font-size:small; text-decoration:none">%s%s</a>', adr, '🌎 ', m_simpleTV.User.YT.Lng.link)
-		if isVideo and m_simpleTV.User.YT.isChapters then
+		if m_simpleTV.User.YT.isVideo == true and m_simpleTV.User.YT.isChapters then
 			link = string.format('%s<br><a href="simpleTVLua:m_simpleTV.Control.ExecuteAction(37) m_simpleTV.Control.ExecuteAction(116)" style="color:#154C9C; font-size: small; text-decoration:none">🕜 %s</a>', link, m_simpleTV.User.YT.Lng.chapter)
 		end
 		desc = string.format('<html><body bgcolor="#101013"><table width="99%%"><tr><td style="padding: 10px 10px 10px;"><a href="%s"><img src="%s"</a></td><td style="padding: 10px 10px 10px; color:#ebebeb; vertical-align:middle;"><h4><font color="#ebeb00">%s</h4><hr>%s%s</td></tr></table></body></html>', adr, logo, name, link, desc)
@@ -1745,7 +1745,7 @@ https://github.com/grafi-tt/lunaJson
 			 return nil, tab
 			end
 			if tab.multicamera
-				and isVideo
+				and m_simpleTV.User.YT.isVideo == true
 				and tab.multicamera.playerLegacyMulticameraRenderer
 				and tab.multicamera.playerLegacyMulticameraRenderer.metadataList
 				and not inAdr:match('&restart')
@@ -2117,7 +2117,7 @@ https://github.com/grafi-tt/lunaJson
 							395, 133, 242, -- 240
 							18, 134, 243, -- 360
 							135, 244, -- 480
-							136, 247, -- 720
+							136, 247, 22, -- 720
 							298, -- 720 (60 fps)
 							302, 334, -- 720 (60 fps, HDR)
 							137, 248, -- 1080
@@ -2132,6 +2132,9 @@ https://github.com/grafi-tt/lunaJson
 							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 							}
+		if m_simpleTV.User.YT.isVideo == false then
+			table.remove(video_itags, 14)
+		end
 			for i = 1, #audio_itags do
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
@@ -2172,7 +2175,7 @@ https://github.com/grafi-tt/lunaJson
 		local extOpt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
 		local extOpt_demux, adr_audio, itag_audio, captionsAdr
 			local function streams(v, u)
-				if v.isAdaptive == true and (audioItag and audioItag_opus) then
+				if v.isAdaptive == true and audioItag then
 					if (audioItag_opus and captions)
 						and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
 					then
@@ -2693,6 +2696,9 @@ https://github.com/grafi-tt/lunaJson
 			local adr = t[id].Address:gsub('$OPT:start%-time=%d+', '')
 			adr = DeCipherSign(adr, t[id].isCipher)
 			m_simpleTV.Control.SetNewAddressT({address = adr, position = m_simpleTV.Control.GetPosition()})
+			if m_simpleTV.Control.GetState() == 0 then
+				m_simpleTV.Control.Restart(false)
+			end
 		end
 		if ret == 2
 			and not m_simpleTV.User.YT.isVideo
@@ -2881,7 +2887,7 @@ https://github.com/grafi-tt/lunaJson
 	 return
 	end
 	if inAdr:match('&isPlst=') then
-		isVideo = false
+		m_simpleTV.User.YT.isVideo = false
 	end
 	if inAdr:match('/user/.-/videos')
 		or inAdr:match('/channel/.-/videos')
@@ -3956,7 +3962,7 @@ https://github.com/grafi-tt/lunaJson
 		local retAdr = t[index].Address
 		retAdr = DeCipherSign(retAdr, t[index].isCipher)
 		m_simpleTV.User.YT.QltyIndex = index
-		if isVideo then
+		if m_simpleTV.User.YT.isVideo == true then
 			local name = title:gsub('%c.-$', '')
 			if not (m_simpleTV.User.YT.isLive
 				and m_simpleTV.Control.ChannelID ~= 268435455)
@@ -3971,7 +3977,6 @@ https://github.com/grafi-tt/lunaJson
 			end
 			m_simpleTV.Control.SetTitle(name)
 			m_simpleTV.Control.CurrentTitle_UTF8 = name
-			m_simpleTV.User.YT.isVideo = true
 			local header, name_header, ap_header, desc, panelDescName
 			local publishedAt = ''
 			if m_simpleTV.User.YT.author
