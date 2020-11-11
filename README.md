@@ -34,7 +34,7 @@
  - в папку _..\luaScr\user\video_
 ---------------------------------------------
 **Удалить несовместимые и неактуальные скрипты**
-- использовать **[remove-illegal-scripts][remove]**
+- использовать **[Trash Cleaner][remove]**
 ---------------------------------------------
 
 [Issues]: ../../issues "Issues"
@@ -44,7 +44,7 @@
 [simpleTV API]: http://iptv.gen12.net/dokuwiki/doku.php?id=mantis:simpletv:api "simpleTV API"
 [Lua]: https://www.lua.org/manual/5.1 "Lua 5.1"
 [License]: ../../blob/master/LICENSE "License Apache 2.0"
-[remove]: ../../../simpleTV-scripts/tree/master/addons/remove-illegal-scripts "удалить несовместимые и неактуальные скрипты"
+[remove]: ../../../simpleTV-scripts/tree/master/addons/TrashCleaner "удалить несовместимые и неактуальные скрипты"
 [simpleTV homepage]: http://iptv.gen12.net "домашняя страница"
 [simpleTV bugtracker]: http://iptv.gen12.net/bugtracker "багтрекер"
 [EN]: ./README-EN.md "english"
