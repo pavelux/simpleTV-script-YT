@@ -2132,7 +2132,9 @@ https://github.com/grafi-tt/lunaJson
 							140, -- MP4 AAC (LC) 128 Kbps Stereo (2)
 							251, -- WebM Opus (VBR) ~160 Kbps Stereo (2)
 							}
-		if m_simpleTV.User.YT.isVideo == false then
+		if (m_simpleTV.User.YT.isVideo == true and m_simpleTV.Control.ChannelID ~= 268435455)
+			or m_simpleTV.User.YT.isVideo == false
+		then
 			table.remove(video_itags, 14)
 		end
 			for i = 1, #audio_itags do
