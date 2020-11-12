@@ -1629,7 +1629,8 @@ https://github.com/grafi-tt/lunaJson
 		end
 	 return index or 1
 	end
-	local function CheckUrl(url, t, index)
+	local function CheckUrl(t, index)
+		local url = t[index].Address
 			if url == 'wait' then
 			 return url
 			end
@@ -1645,26 +1646,24 @@ https://github.com/grafi-tt/lunaJson
 			if not session then
 			 return url
 			end
-		m_simpleTV.Http.SetTimeout(session, 12000)
+		m_simpleTV.Http.SetTimeout(session, 8000)
 		m_simpleTV.Http.Request(session, {url = url:gsub('$.+',''), method = 'head'})
 		local raw = m_simpleTV.Http.GetRawHeader(session)
 		m_simpleTV.Http.Close(session)
-			if not raw then
-			 return url
+			if raw:match('Content%-Length: 0') then
+				if index > 2 then
+					index = index - 1
+				elseif #t > index then
+					index = index + 1
+				else
+				 return m_simpleTV.User.YT.logoDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
+				end
+				url = t[index].Address
+				if t[index].isCipher then
+					url = DeCipherSign(url)
+				end
+			 return url, t[index].itag
 			end
-		if raw:match('Content%-Length: 0') then
-			if index > 2 then
-				index = index - 1
-			elseif #t > index then
-				index = index + 1
-			else
-			 return m_simpleTV.User.YT.logoDisk .. '$OPT:video-filter=adjust$OPT:saturation=0$OPT:video-filter=gaussianblur$OPT:image-duration=5'
-			end
-			url = t[index].Address
-			if t[index].isCipher then
-				url = DeCipherSign(url)
-			end
-		end
 	 return url
 	end
 	local function GetStreamsTab(vId)
@@ -2731,7 +2730,7 @@ https://github.com/grafi-tt/lunaJson
 				ShowMessage(t[id].Name)
 			end
 			local retAdr = t[id].Address:gsub('$OPT:start%-time=%d+', '')
-			retAdr = CheckUrl(retAdr, t, id)
+			retAdr = CheckUrl(t, id)
 			m_simpleTV.Control.SetNewAddressT({address = retAdr, position = m_simpleTV.Control.GetPosition()})
 			if m_simpleTV.Control.GetState() == 0 then
 				m_simpleTV.Control.Restart(false)
@@ -3520,7 +3519,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		retAdr = retAdr or t[index].Address
 		m_simpleTV.User.YT.QltyIndex = index
-		retAdr = CheckUrl(retAdr, t, index)
+		retAdr = CheckUrl(t, index)
 		if not (#tab == 1 and m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 600) then
 			retAdr = retAdr .. '$OPT:POSITIONTOCONTINUE=0'
 		end
@@ -3734,7 +3733,7 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = retAdr or t[index].Address
 			m_simpleTV.User.YT.QltyIndex = index
 			m_simpleTV.Control.CurrentTitle_UTF8 = header
-			retAdr = CheckUrl(retAdr, t, index)
+			retAdr = CheckUrl(t, index)
 			m_simpleTV.User.YT.AddToBaseUrlinAdr = inAdr
 			plstPicId = tab[1].Address:match('watch%?v=([^&]+)')
 			m_simpleTV.User.YT.AddToBaseVideoIdPlst = plstPicId
@@ -3941,7 +3940,7 @@ https://github.com/grafi-tt/lunaJson
 			retAdr = retAdr or t[index].Address
 			m_simpleTV.User.YT.QltyIndex = index
 			retAdr = DeCipherSign(retAdr, t[index].isCipher)
-			retAdr = CheckUrl(retAdr, t, index)
+			retAdr = CheckUrl(t, index)
 			local plstPicId
 			if plstId:match('^RD') then
 				local plstPicIdRD = plstId:gsub('^RD', '')
@@ -3997,8 +3996,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		m_simpleTV.User.YT.QltyTab = t
 		local index = GetQltyIndex(t)
-		local retAdr = t[index].Address
-		retAdr = CheckUrl(retAdr, t, index)
+		local retAdr, noItag22 = CheckUrl(t, index)
 		m_simpleTV.User.YT.QltyIndex = index
 		if m_simpleTV.User.YT.isVideo == true then
 			local name = title:gsub('%c.-$', '')
@@ -4152,7 +4150,7 @@ https://github.com/grafi-tt/lunaJson
 			infoInFile = '\n'
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
-						.. 'video itag: ' .. tostring(t[index].itag)
+						.. 'video itag: ' .. (noItag22 or tostring(t[index].itag))
 						.. ' | audio itag: ' .. tostring(t[index].audioItag) .. '\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(t[index].isCipher)
