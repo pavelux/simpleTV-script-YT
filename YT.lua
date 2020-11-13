@@ -1659,7 +1659,7 @@ https://github.com/grafi-tt/lunaJson
 				if t[index].isCipher then
 					url = DeCipherSign(url)
 				end
-			 return url, t[index].itag
+			 return url, index
 			end
 	 return url
 	end
@@ -4142,10 +4142,11 @@ https://github.com/grafi-tt/lunaJson
 			local calc = scr_time - inf0
 			local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
 			local string_rep = string.rep('–', 70) .. '\n'
+			index = noItag22 or index
 			infoInFile = '\n'
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
-						.. 'video itag: ' .. (noItag22 or tostring(t[index].itag))
+						.. 'video itag: ' .. tostring(t[index].itag)
 						.. ' | audio itag: ' .. tostring(t[index].audioItag) .. '\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(t[index].isCipher)
