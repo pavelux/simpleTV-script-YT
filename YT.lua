@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (12/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (14/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -2007,9 +2007,11 @@ https://github.com/grafi-tt/lunaJson
 			 return stream_tab_err, title_err
 			end
 		local captions, captions_title
+		local subtitle_config = m_simpleTV.Config.GetValue('subtitle/disableAtStart', 'simpleTVConfig') or 'true'
 		if tab.captions
 			and tab.captions.playerCaptionsTracklistRenderer
 			and tab.captions.playerCaptionsTracklistRenderer.captionTracks
+			and subtitle_config == 'true'
 		then
 				local function Subtitle()
 					local subt = {}
@@ -2206,8 +2208,8 @@ https://github.com/grafi-tt/lunaJson
 			end
 		t, u = {}, 1
 		local extOpt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-		local extOpt_demux, adr_audio, itag_audio, captionsAdr
 			local function streams(v, u)
+				local extOpt_demux, adr_audio, itag_audio, captionsAdr
 				if v.isAdaptive == true and audioItag then
 					if (audioItag_opus and captions)
 						and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
