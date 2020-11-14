@@ -455,7 +455,7 @@ local infoInFile = false
 	end
 	local function ShowMessage(m, id)
 		id = id or 'channelName'
-		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 16, id = id})
+		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 6, id = id})
 	end
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
 --[[The MIT License (MIT)
