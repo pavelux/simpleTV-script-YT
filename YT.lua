@@ -188,7 +188,6 @@ local infoInFile = false
 	local isPlst = false
 	local isChPlst = false
 	local isPlstVideos = false
-	local isInfoPanel = true
 	local videoId = inAdr:match('[%?&/]v[=/](.+)')
 				or inAdr:match('/embed/(.+)')
 				or inAdr:match('/watch/(.+)')
@@ -196,10 +195,14 @@ local infoInFile = false
 				or inAdr:match('video_id=(.+)')
 				or ''
 	videoId = videoId:sub(1, 11)
-	local infoPanel = m_simpleTV.Config.GetValue('mainOsd/showTimeInfoPanel', 'simpleTVConfig') or 0
-	if tostring(infoPanel) == '0' then
-		isInfoPanel = false
+	local function chk_infoPanel()
+		local infoPanel = tonumber(m_simpleTV.Config.GetValue('mainOsd/showTimeInfoPanel', 'simpleTVConfig')) or 0
+			if infoPanel > 0 then
+			 return true
+			end
+	 return false
 	end
+	local isInfoPanel = chk_infoPanel()
 	if not m_simpleTV.User.YT.Lng then
 		m_simpleTV.User.YT.Lng = {}
 		if m_simpleTV.Interface.GetLanguage() == 'ru' then
@@ -452,7 +455,7 @@ local infoInFile = false
 	end
 	local function ShowMessage(m, id)
 		id = id or 'channelName'
-		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 6, id = id})
+		m_simpleTV.OSD.ShowMessageT({text = m, color = 0xFF8080FF, showTime = 1000 * 16, id = id})
 	end
 	local function lunaJson_decode(json_, pos_, nullv_, arraylen_)
 --[[The MIT License (MIT)
@@ -1441,7 +1444,7 @@ https://github.com/grafi-tt/lunaJson
 			m_simpleTV.User.YT.PositionThumbsHandler = m_simpleTV.PositionThumbs.AddHandler(handlerInfo)
 		end
 	end
-	local function Title_isInfoPanel_false(title, name)
+	local function title_is_no_infoPanel(title, name)
 		if m_simpleTV.User.YT.isTrailer == true then
 			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.preview
 		end
@@ -3533,8 +3536,8 @@ https://github.com/grafi-tt/lunaJson
 				m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
 			end
 		end
-		if isInfoPanel == false then
-			title = Title_isInfoPanel_false(title, t[index].Name)
+		if chk_infoPanel() == false then
+			title = title_is_no_infoPanel(title, t[index].Name)
 			ShowMessage('◽️ ' .. header .. '\n' .. title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 		end
 	 return
@@ -3745,8 +3748,8 @@ https://github.com/grafi-tt/lunaJson
 						m_simpleTV.Control.ChangeChannelName(header, m_simpleTV.Control.ChannelID, false)
 				end
 			end
-			if isInfoPanel == false then
-				title = Title_isInfoPanel_false(title, t[index].Name)
+			if chk_infoPanel() == false then
+				title = title_is_no_infoPanel(title, t[index].Name)
 				ShowMessage('◽️ ' .. header .. '\n' .. title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 			end
 			if not (#tab == 1 and m_simpleTV.User.YT.duration and m_simpleTV.User.YT.duration > 600) then
@@ -3971,8 +3974,8 @@ https://github.com/grafi-tt/lunaJson
 				else
 					m_simpleTV.Control.SetTitle(header .. ' (' .. title .. ')')
 				end
-				if isInfoPanel == false then
-					title = Title_isInfoPanel_false(title, t[index].Name)
+				if chk_infoPanel() == false then
+					title = title_is_no_infoPanel(title, t[index].Name)
 					ShowMessage('◽️ ' .. header .. '\n' .. title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.plst)
 				end
 			end
@@ -4132,7 +4135,7 @@ https://github.com/grafi-tt/lunaJson
 		end
 		MarkWatch_YT()
 		if isInfoPanel == false then
-			title = Title_isInfoPanel_false(title, t[index].Name)
+			title = title_is_no_infoPanel(title, t[index].Name)
 			ShowMessage(title)
 		end
 		m_simpleTV.Http.Close(session)
