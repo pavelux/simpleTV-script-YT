@@ -1390,6 +1390,7 @@ https://github.com/grafi-tt/lunaJson
 			for i = 1, #tab do
 				local title = tab[i].title:gsub('%(%s*%)', ''):gsub('%[%s*%]', '')
 				title = title:match('^[:%[%]%s%-%.]*(.-)[:%[%]%s%-%.]*$')
+				title = title:gsub('%(%s*%-%s*%)', '')
 				chaptersT.chapters[i] = {}
 				chaptersT.chapters[i].seekpoint = tab[i].seekpoint * 1000
 				chaptersT.chapters[i].name = title
