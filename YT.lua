@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (14/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (15/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -1540,6 +1540,158 @@ https://github.com/grafi-tt/lunaJson
 								or answer:match('[%.,]sts:["]*(%d+)')
 		m_simpleTV.User.YT.signScr = signScr
 	end
+	local function Subtitle(tab)
+		local subt = {}
+		local subtList = tostring(m_simpleTV.Config.GetValue('subtitle/lang', 'simpleTVConfig') or '')
+		if subtList == 'none'
+			or subtList == ''
+		then
+			subt[1] = m_simpleTV.User.YT.Lng.hl_sub
+		else
+			subtList = subtList:gsub('%s', ',')
+			subtList = subtList:gsub('[^%d%a,%-_]', '')
+			subtList = subtList:gsub('_', '-')
+			subtList = subtList:gsub(',+', ',')
+			subt = split_str(subtList, ',')
+			if #subt == 0 then
+				subt[1] = m_simpleTV.User.YT.Lng.hl_sub
+			end
+		end
+		local r = 1
+		local languageCode, kind, q, subtAdr
+			while true do
+					if not subt[r] or subtAdr then break end
+				q = 1
+				while true do
+						if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[q] then break end
+					languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].languageCode
+					kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].kind
+						if languageCode
+							and (not kind or kind ~= 'asr')
+							and languageCode == subt[r]
+						then
+							subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl .. '&fmt=vtt'
+						 break
+						end
+					q = q + 1
+				end
+				r = r + 1
+			end
+			if subtAdr then
+			 return subtAdr, ''
+			end
+			if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
+				or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
+			then
+			 return
+			end
+		r = 1
+		local lngCodeTr
+			while true do
+					if not subt[r] or lngCodeTr then break end
+				q = 1
+				while true do
+						if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q] then break end
+					languageCode = tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q].languageCode
+						if languageCode
+							and languageCode == subt[r]
+						then
+							lngCodeTr = languageCode
+						 break
+						end
+					q = q + 1
+				end
+				r = r + 1
+			end
+			if not lngCodeTr then return end
+		r = 1
+			while true do
+					if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[r] then break end
+				languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].languageCode
+				kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].kind
+					if languageCode
+						and (not kind or kind ~= 'asr')
+						and languageCode ~= 'na'
+					then
+						subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr .. '&fmt=vtt'
+					 break
+					end
+				r = r + 1
+			end
+			if not subtAdr then return end
+	 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
+	end
+	local function streamStart(strStart)
+		local h = strStart:match('(%d+)h') or 0
+		local m = strStart:match('(%d+)m') or 0
+		local s = strStart:match('(%d+)s') or 0
+		local d = strStart:match('(%d+)') or 0
+		local st = (h * 3600) + (m * 60) + s
+		if st ~= 0 then
+			strStart = st
+		else
+			strStart = d
+		end
+	 return '$OPT:start-time=' .. strStart
+	end
+	local function streamsTabError(tab, title)
+			if not tab.playabilityStatus then
+			 return nil, '⚠️ ' .. m_simpleTV.User.YT.Lng.videoNotExst
+			end
+		local title_err, stream_tab_err
+		if tab.playabilityStatus.status == 'LOGIN_REQUIRED'
+		then
+			title_err = m_simpleTV.User.YT.Lng.noCookies
+		elseif tab.playabilityStatus.errorScreen
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs[1]
+		then
+			local t, i = {}, 1
+				for i = 1, #tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs do
+					t[i] = {}
+					t[i] = tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs[i].text
+				end
+			title_err = table.concat(t)
+		elseif tab.playabilityStatus.errorScreen
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason
+			and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.simpleText
+		then
+			title_err = tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.simpleText
+		elseif tab.playabilityStatus.liveStreamability
+			and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer
+			and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate
+			and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer
+			and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText
+			and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs[1]
+		then
+			local t, i = {}, 1
+				for i = 1, #tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs do
+					t[i] = {}
+					t[i] = tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs[i].text
+				end
+			title_err = table.concat(t)
+		else
+			title_err = tab.playabilityStatus.reason or m_simpleTV.User.YT.Lng.videoNotAvail
+		end
+		if not title or title == '' then
+			title = ''
+		end
+		if title_err then
+			if title ~= '' then
+				title_err = '\n⚠️ ' .. title_err
+			else
+				title_err = '⚠️ ' .. title_err
+			end
+		end
+		title_err = title .. (title_err or '')
+		if m_simpleTV.User.YT.pic then
+			stream_tab_err = {{Name = '', Address = m_simpleTV.User.YT.pic .. '$OPT:NO-STIMESHIFT$OPT:image-duration=6'}}
+		end
+	 return stream_tab_err, title_err
+	end
 	local function DeCipherSign(adr)
 			local function table_swap(t, a)
 					if a >= #t then return end
@@ -1682,24 +1834,12 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-			local function sTime()
-				local t = inAdr:match('[%?&]t=[^&]*')
-				if t and videoId == m_simpleTV.User.YT.vId then
-					local h = t:match('(%d+)h') or 0
-					local m = t:match('(%d+)m') or 0
-					local s = t:match('(%d+)s') or 0
-					local d = t:match('(%d+)') or 0
-					local st = (h * 3600) + (m * 60) + s
-					if st ~= 0 then
-						t = st
-					else
-						t = d
-					end
-				 return '$OPT:start-time=' .. t
-				end
-			 return
-			end
-		local sTime = sTime()
+		local strStart = inAdr:match('[%?&]t=[^&]*')
+		if strStart and videoId == m_simpleTV.User.YT.vId then
+			strStart = streamStart(strStart)
+		else
+			strStart = nil
+		end
 		local session = m_simpleTV.Http.New(userAgent2)
 			if not session then
 			 return nil, 'GetStreamsTab session error 1'
@@ -1962,61 +2102,9 @@ https://github.com/grafi-tt/lunaJson
 		end
 			if #t == 0 then
 					if urlAdr:match('PARAMS=psevdotv') then return end
-				local title_err, stream_tab_err
-				if tab.playabilityStatus then
-					if tab.playabilityStatus.status
-						and tab.playabilityStatus.status == 'LOGIN_REQUIRED'
-					then
-						title_err = m_simpleTV.User.YT.Lng.noCookies
-					elseif tab.playabilityStatus.errorScreen
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs[1]
-						then
-							local t, i = {}, 1
-								for i = 1, #tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs do
-									t[i] = {}
-									t[i] = tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.runs[i].text
-								end
-							title_err = table.concat(t)
-					elseif tab.playabilityStatus.errorScreen
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason
-						and tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.simpleText
-						then
-							title_err = tab.playabilityStatus.errorScreen.playerErrorMessageRenderer.subreason.simpleText
-							if tab.playabilityStatus.reason then
-								title = tab.playabilityStatus.reason
-							end
-					elseif tab.playabilityStatus.liveStreamability
-						and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer
-						and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate
-						and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer
-						and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText
-						and tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs[1]
-						then
-							local t, i = {}, 1
-								for i = 1, #tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs do
-									t[i] = {}
-									t[i] = tab.playabilityStatus.liveStreamability.liveStreamabilityRenderer.offlineSlate.liveStreamOfflineSlateRenderer.mainText.runs[i].text
-								end
-							title_err = table.concat(t)
-					elseif tab.playabilityStatus.reason then
-						title_err = tab.playabilityStatus.reason
-					end
-					if not title_err or title_err == '' or title == '' then
-						title_err = '⚠️ ' .. m_simpleTV.User.YT.Lng.videoNotAvail
-					else
-						title_err = title .. '\n⚠️ ' .. title_err
-					end
-					if m_simpleTV.User.YT.pic then
-						stream_tab_err = {{Name = '', Address = m_simpleTV.User.YT.pic .. '$OPT:NO-STIMESHIFT$OPT:image-duration=6'}}
-					end
-				end
 				isInfoPanel = false
 				m_simpleTV.Http.Close(session)
-			 return stream_tab_err, title_err
+			 return streamsTabError(tab, title)
 			end
 		local captions, captions_title
 		local subtitle_config = m_simpleTV.Config.GetValue('subtitle/disableAtStart', 'simpleTVConfig') or 'true'
@@ -2025,88 +2113,7 @@ https://github.com/grafi-tt/lunaJson
 			and tab.captions.playerCaptionsTracklistRenderer.captionTracks
 			and subtitle_config == 'true'
 		then
-				local function Subtitle()
-					local subt = {}
-					local subtList = tostring(m_simpleTV.Config.GetValue('subtitle/lang', 'simpleTVConfig') or '')
-					if subtList == 'none'
-						or subtList == ''
-					then
-						subt[1] = m_simpleTV.User.YT.Lng.hl_sub
-					else
-						subtList = subtList:gsub('%s', ',')
-						subtList = subtList:gsub('[^%d%a,%-_]', '')
-						subtList = subtList:gsub('_', '-')
-						subtList = subtList:gsub(',+', ',')
-						subt = split_str(subtList, ',')
-						if #subt == 0 then
-							subt[1] = m_simpleTV.User.YT.Lng.hl_sub
-						end
-					end
-					local r = 1
-					local languageCode, kind, q, subtAdr
-					while true do
-							if not subt[r] or subtAdr then break end
-						q = 1
-						while true do
-								if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[q] then break end
-							languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].languageCode
-							kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].kind
-								if languageCode
-									and (not kind or kind ~= 'asr')
-									and languageCode == subt[r]
-								then
-									subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[q].baseUrl .. '&fmt=vtt'
-								 break
-								end
-							q = q + 1
-						end
-						r = r + 1
-					end
-						if subtAdr then
-						 return subtAdr, ''
-						end
-						if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages
-							or not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[1]
-						then
-						 return
-						end
-					r = 1
-					local lngCodeTr
-					while true do
-							if not subt[r] or lngCodeTr then break end
-						q = 1
-						while true do
-								if not tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q] then break end
-							languageCode = tab.captions.playerCaptionsTracklistRenderer.translationLanguages[q].languageCode
-								if languageCode
-									and languageCode == subt[r]
-								then
-									lngCodeTr = languageCode
-								 break
-								end
-							q = q + 1
-						end
-						r = r + 1
-					end
-						if not lngCodeTr then return end
-					r = 1
-					while true do
-							if not tab.captions.playerCaptionsTracklistRenderer.captionTracks[r] then break end
-						languageCode = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].languageCode
-						kind = tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].kind
-							if languageCode
-								and (not kind or kind ~= 'asr')
-								and languageCode ~= 'na'
-							then
-								subtAdr = '#' .. tab.captions.playerCaptionsTracklistRenderer.captionTracks[r].baseUrl .. '&tlang=' .. lngCodeTr .. '&fmt=vtt'
-							 break
-							end
-						r = r + 1
-					end
-						if not subtAdr then return end
-				 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
-				end
-			captions, captions_title = Subtitle()
+			captions, captions_title = Subtitle(tab)
 		end
 			for i = 1, #t do
 				t[i].qlty = tonumber(t[i].qlty or '0')
@@ -2238,7 +2245,7 @@ https://github.com/grafi-tt/lunaJson
 					t[u] = v
 					t[u].audioItag = itag_audio
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (sTime or '')
+									.. (strStart or '')
 									.. (extOpt_demux or '')
 									.. extOpt
 									.. adr_audio
@@ -2248,7 +2255,7 @@ https://github.com/grafi-tt/lunaJson
 				if v.isAdaptive == false then
 					t[u] = v
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (sTime or '')
+									.. (strStart or '')
 									.. extOpt
 									.. (captions or '')
 					u = u + 1
@@ -2271,7 +2278,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		local audioAdrName, audioId, itag_a
 		if audioAdr_opus or audioAdr then
-			audioAdr = (audioAdr_opus or audioAdr) .. (sTime or '') .. '$OPT:NO-STIMESHIFT'
+			audioAdr = (audioAdr_opus or audioAdr) .. (strStart or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
