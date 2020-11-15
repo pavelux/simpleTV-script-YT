@@ -34,7 +34,7 @@
  - to the _..\luaScr\user\video_
 ---------------------------------------------
 **Remove incompatible and outdated scripts**
-- use **[Trash Cleaner][remove]**
+- use **[`Trash Cleaner`][remove]**
 ---------------------------------------------
 
 [Issues]: ../../issues "Issues"
