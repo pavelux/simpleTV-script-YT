@@ -31,7 +31,7 @@
 ###### UTF-8 encoding without BOM
 ---------------------------------------------
 **Installation**
- - to the _..\luaScr\user\video_
+ - to the _`..\luaScr\user\video`_
 ---------------------------------------------
 **Remove incompatible and outdated scripts**
 - use **[`Trash Cleaner`][remove]**
