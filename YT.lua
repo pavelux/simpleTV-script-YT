@@ -1681,9 +1681,9 @@ https://github.com/grafi-tt/lunaJson
 		end
 		if title_err then
 			if title ~= '' then
-				title_err = '\n⚠️ ' .. title_err
+				title_err = '\nℹ️ ' .. title_err
 			else
-				title_err = '⚠️ ' .. title_err
+				title_err = 'ℹ️ ' .. title_err
 			end
 		end
 		title_err = title .. (title_err or '')
