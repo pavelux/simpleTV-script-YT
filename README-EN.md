@@ -34,7 +34,7 @@
  - put **`YT.lua`** in _`..\luaScr\user\video`_
 ---------------------------------------------
 **Remove incompatible and outdated scripts**
-- use «**[Trash Cleaner][remove]**» addon
+- use «**[Trash Cleaner][remove]**» add-on
 ---------------------------------------------
 
 [Issues]: ../../issues "Issues"
