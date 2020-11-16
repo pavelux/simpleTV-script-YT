@@ -31,10 +31,10 @@
 ###### UTF-8 encoding without BOM
 ---------------------------------------------
 **Installation**
- - to the _`..\luaScr\user\video`_
+ - put **`YT.lua`** in _`..\luaScr\user\video`_
 ---------------------------------------------
 **Remove incompatible and outdated scripts**
-- use **[`Trash Cleaner`][remove]**
+- use «**[Trash Cleaner][remove]**» addon
 ---------------------------------------------
 
 [Issues]: ../../issues "Issues"
