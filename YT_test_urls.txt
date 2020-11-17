@@ -1,18 +1,17 @@
 поиск:
--простоквашино (видео)
---taylor swift (плейлистов)
----becky g (каналов)
--+вселенная (прямых трансляций)
+- маша и медведь (видео)
+-- простоквашино (плейлистов)
+--- Фильмы  (каналов)
+-+ вселенная (прямых трансляций)
 ---------------------------------------------------
 cookies нужны:
-https://www.youtube.com/feed/channels - список подписаных каналов
-https://www.youtube.com/feed/rss_channels - список подписаных каналов, открывает ленту канала - RSS feed
+https://www.youtube.com/feed/channels - список подписок (каналы)
+https://www.youtube.com/feed/rss_channels - список подписок (ленты каналов - RSS feed)
 https://www.youtube.com/feed/subscriptions - подписки
 https://www.youtube.com/feed/history - история
 https://www.youtube.com/playlist?list=LL - понравившиеся
 https://www.youtube.com/playlist?list=LM - понравившиеся (музыка)
 https://www.youtube.com/playlist?list=WL - посмотреть позже
-https://www.youtube.com/watch?v=c90fkhgpq04&list=WL&t=0s&index=3 - посмотреть позже
 https://www.youtube.com/watch?v=jwhq08k_uVo = предосмотр
 https://www.youtube.com/watch?v=kFW8kJ9Y1tM - видео
 ---------------------------------------------------
