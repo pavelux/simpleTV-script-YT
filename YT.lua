@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (15/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (20/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,9 +32,7 @@ local infoInFile = false
 	end
 	m_simpleTV.OSD.ShowMessageT({text = '', color = 0xFF8080FF, showTime = 1000, id = 'channelName'})
 	htmlEntities = require 'htmlEntities'
-	require 'ex'
 	require 'lfs'
-	require 'jsdecode'
 	require 'asynPlsLoaderHelper'
 	local inAdr = m_simpleTV.Control.CurrentAddress
 	local urlAdr = inAdr
@@ -184,7 +182,6 @@ local infoInFile = false
 	local plstId
 	local plstIndex
 	local plstPos
-	local isJsDecode = false
 	local isPlst = false
 	local isChPlst = false
 	local isPlstVideos = false
@@ -1510,32 +1507,23 @@ https://github.com/grafi-tt/lunaJson
 		rc, answer = m_simpleTV.Http.Request(sessionGetSignScr, {url = url, headers = 'Referer: ' .. adr})
 		m_simpleTV.Http.Close(sessionGetSignScr)
 			if rc ~= 200 then return end
-		local signScr
-		if isJsDecode then
-			local p1, p2, p3 = answer:match('(function%(a%){a=a%.split%(""%);)(..)(%.%a%a.-return a%.join%(""%)};)')
-				if not p1 or not p2 or not p3 then return end
-			local p4 = answer:match('var ' .. p2 .. '.-};')
-				if not p4 then return end
-			signScr = 'decode=' .. p1 .. p2 .. p3 .. p4
-		else
-			local l, obj = answer:match('%(a%){a=a%.split%(""%)((;..)%.[^%s]+)')
-				if not l or not obj then return end
-			local func, p
-			local i = 1
-			signScr = {}
-				for param in l:gmatch(obj .. '%.([^%)]+)') do
-					func, p = param:match('(..)%(a,(%d+)')
-					func = answer:match('[%p%s]' .. func .. ':function([^}]+)')
-					if func:match('a%.reverse') then
-						p = 0
-					end
-					if func:match('a%.splice') then
-						p = '-' .. p
-					end
-					signScr[i] = tonumber(p)
-					i = i + 1
+		local l, obj = answer:match('%(a%){a=a%.split%(""%)((;..)%.[^%s]+)')
+			if not l or not obj then return end
+		local func, p
+		local i = 1
+		local signScr = {}
+			for param in l:gmatch(obj .. '%.([^%)]+)') do
+				func, p = param:match('(..)%(a,(%d+)')
+				func = answer:match('[%p%s]' .. func .. ':function([^}]+)')
+				if func:match('a%.reverse') then
+					p = 0
 				end
-		end
+				if func:match('a%.splice') then
+					p = '-' .. p
+				end
+				signScr[i] = tonumber(p)
+				i = i + 1
+			end
 		m_simpleTV.User.YT.sts = answer:match('signatureTimestamp[=:](%d+)')
 								or answer:match('[%.,]sts:["]*(%d+)')
 		m_simpleTV.User.YT.signScr = signScr
@@ -1730,26 +1718,12 @@ https://github.com/grafi-tt/lunaJson
 					end
 			 return table.concat(t)
 			end
-		if isJsDecode
-			and m_simpleTV.User.YT.signScr
-			and type(m_simpleTV.User.YT.signScr) ~= 'string'
-			or not isJsDecode
-			and m_simpleTV.User.YT.signScr
-			and type(m_simpleTV.User.YT.signScr) == 'string'
-		then
-			GetSignScr()
-		end
 			if not m_simpleTV.User.YT.signScr then
 				ShowInfo('error DeCipherSign')
 			 return	'vlc://pause:5'
 			end
-		local signature
 			for cipherSign in adr:gmatch('&s=([^&]*)') do
-				if isJsDecode then
-					signature = jsdecode.DoDecode('decode("' .. cipherSign ..'")', false, m_simpleTV.User.YT.signScr, 128)
-				else
-					signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
-				end
+				local signature = sign_decode(cipherSign, m_simpleTV.User.YT.signScr)
 				adr = adr:gsub('&s=[^&]*', '&sig=' .. signature, 1)
 			end
 	 return adr
@@ -1916,6 +1890,9 @@ https://github.com/grafi-tt/lunaJson
 		player_response = m_simpleTV.Common.fromPercentEncoding(player_response)
 		local err, tab = pcall(lunaJson_decode, player_response)
 			if err == false then
+				if infoInFile then
+					debug_in_file(answer, m_simpleTV.Common.GetMainPath(2) .. 'YT_player_response.txt', true)
+				end
 			 return nil, tab
 			end
 			if tab.multicamera
@@ -4162,15 +4139,14 @@ https://github.com/grafi-tt/lunaJson
 			local adr = m_simpleTV.Common.fromPercentEncoding(retAdr)
 			local string_rep = string.rep('–', 70) .. '\n'
 			index = noItag22 or index
-			infoInFile = '\n'
+			infoInFile = string_rep
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
 						.. 'video itag: ' .. tostring(t[index].itag)
 						.. ' | audio itag: ' .. tostring(t[index].audioItag) .. '\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(t[index].isCipher)
-						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts)
-						.. ' | "jsdecode" used: ' .. tostring(isJsDecode) .. '\n'
+						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
 						.. string_rep
 						.. 'time: ' .. scr_time .. ' s.'
 						.. ' | request: ' .. inf0 .. ' s.'
