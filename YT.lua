@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (21/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (22/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -1611,18 +1611,18 @@ https://github.com/grafi-tt/lunaJson
 			if not subtAdr then return end
 	 return subtAdr, ' (' .. m_simpleTV.User.YT.Lng.subTr .. ')'
 	end
-	local function streamStart(strStart)
-		local h = strStart:match('(%d+)h') or 0
-		local m = strStart:match('(%d+)m') or 0
-		local s = strStart:match('(%d+)s') or 0
-		local d = strStart:match('(%d+)') or 0
+	local function streamStart(adrStart)
+		local h = adrStart:match('(%d+)h') or 0
+		local m = adrStart:match('(%d+)m') or 0
+		local s = adrStart:match('(%d+)s') or 0
+		local d = adrStart:match('(%d+)') or 0
 		local st = (h * 3600) + (m * 60) + s
 		if st ~= 0 then
-			strStart = st
+			adrStart = st
 		else
-			strStart = d
+			adrStart = d
 		end
-	 return '$OPT:start-time=' .. strStart
+	 return '$OPT:start-time=' .. adrStart
 	end
 	local function streamsTabError(tab, title)
 			if not tab.playabilityStatus then
@@ -1810,11 +1810,11 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.User.YT.isTrailer = false
 		m_simpleTV.User.YT.desc = ''
 		m_simpleTV.User.YT.isMusic = false
-		local strStart = inAdr:match('[%?&]t=[^&]*')
-		if strStart and videoId == m_simpleTV.User.YT.vId then
-			strStart = streamStart(strStart)
+		local adrStart = inAdr:match('[%?&]t=[^&]*')
+		if adrStart and videoId == m_simpleTV.User.YT.vId then
+			adrStart = streamStart(adrStart)
 		else
-			strStart = nil
+			adrStart = nil
 		end
 		local session = m_simpleTV.Http.New(userAgent2)
 			if not session then
@@ -2216,15 +2216,14 @@ https://github.com/grafi-tt/lunaJson
 						itag_audio = audioItag_opus
 						captionsAdr = captions
 					else
-						extOpt_demux = '$OPT:demux=avcodec,any'
 						adr_audio = audioAdr
 						itag_audio = audioItag
-						captionsAdr = nil
+						extOpt_demux = '$OPT:demux=avcodec,any'
 					end
 					t[u] = v
 					t[u].audioItag = itag_audio
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (strStart or '')
+									.. (adrStart or '')
 									.. (extOpt_demux or '')
 									.. extOpt
 									.. adr_audio
@@ -2234,7 +2233,7 @@ https://github.com/grafi-tt/lunaJson
 				if v.isAdaptive == false then
 					t[u] = v
 					t[u].Address = GetAdr(v.Address, v.isCipher)
-									.. (strStart or '')
+									.. (adrStart or '')
 									.. extOpt
 									.. (captions or '')
 					u = u + 1
@@ -2257,7 +2256,7 @@ https://github.com/grafi-tt/lunaJson
 			end
 		local audioAdrName, audioId, itag_a
 		if audioAdr_opus or audioAdr then
-			audioAdr = (audioAdr_opus or audioAdr) .. (strStart or '') .. '$OPT:NO-STIMESHIFT'
+			audioAdr = (audioAdr_opus or audioAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT'
 			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
