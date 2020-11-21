@@ -1369,9 +1369,8 @@ https://github.com/grafi-tt/lunaJson
 					local hour = d[i]:match('(%d+):%d+:%d+') or 0
 					local seekpoint = (sec + (min * 60) + (hour * 60 * 60))
 					local title = d[i]:gsub('[%d:]*%d+:%d+', '')
-					if (seekpoint < m_simpleTV.User.YT.duration)
+					if seekpoint < m_simpleTV.User.YT.duration
 						and title ~= ''
-						and m_simpleTV.Common.lenUTF8(title) < 100
 					then
 						tab[z] = {}
 						tab[z].seekpoint = seekpoint
