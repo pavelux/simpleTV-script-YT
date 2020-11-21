@@ -1038,8 +1038,8 @@ https://github.com/grafi-tt/lunaJson
 			txtparm = 1 + 4
 			local codec = ''
 			local title
-			if m_simpleTV.Common.lenUTF8(m_simpleTV.User.YT.title) > 50 then
-				title = truncateUtf8(m_simpleTV.User.YT.title, 55) .. '...'
+			if m_simpleTV.Common.lenUTF8(m_simpleTV.User.YT.title) > 70 then
+				title = truncateUtf8(m_simpleTV.User.YT.title, 65) .. '...'
 			else
 				title = m_simpleTV.User.YT.title
 			end
