@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (20/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (21/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -1369,7 +1369,10 @@ https://github.com/grafi-tt/lunaJson
 					local hour = d[i]:match('(%d+):%d+:%d+') or 0
 					local seekpoint = (sec + (min * 60) + (hour * 60 * 60))
 					local title = d[i]:gsub('[%d:]*%d+:%d+', '')
-					if (seekpoint < m_simpleTV.User.YT.duration) and title ~= '' then
+					if (seekpoint < m_simpleTV.User.YT.duration)
+						and title ~= ''
+						and m_simpleTV.Common.lenUTF8(title) < 100
+					then
 						tab[z] = {}
 						tab[z].seekpoint = seekpoint
 						tab[z].title = title
