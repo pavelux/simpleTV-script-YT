@@ -1794,6 +1794,30 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return url
 	end
+	local function Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+		local adr = GetAdr(v.Address, v.isCipher)
+			.. (adrStart or '')
+			.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
+		if v.isAdaptive == true and aItag then
+			local extOpt_demux, adr_audio, itag_audio, adr_captions
+			if (aItag_opus and captions)
+				and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
+			then
+				adr_audio = aAdr_opus
+				itag_audio = aItag_opus
+				adr_captions = captions
+			else
+				adr_audio = aAdr
+				itag_audio = aItag
+				extOpt_demux = '$OPT:demux=avcodec,any'
+			end
+			v.aItag = itag_audio
+			v.Address = adr .. adr_audio .. (adr_captions or '') .. (extOpt_demux or '')
+		else
+			v.Address = adr .. (captions or '')
+		end
+	 return v
+	end
 	local function GetStreamsTab(vId)
 		m_simpleTV.Http.Close(session)
 		m_simpleTV.User.YT.ThumbsInfo = nil
@@ -2142,7 +2166,7 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		local audioAdr, audioItag, audioAdr_isCipher, audioItag_opus, audioAdr_opus
+		local aAdr, aItag, aAdr_isCipher, aItag_opus, aAdr_opus
 		local video_itags = {
 							394, 160, 278, -- 144
 							395, 133, 242, -- 240
@@ -2172,96 +2196,65 @@ https://github.com/grafi-tt/lunaJson
 				for z = 1, #t do
 					if audio_itags[i] == t[z].itag then
 						if audio_itags[i] == 251 then
-							audioAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
-							audioItag_opus = t[z].itag
-							audioAdr_isCipher = t[z].isCipher
-						elseif not audioItag then
-							audioAdr = GetAdr(t[z].Address, t[z].isCipher)
-							audioItag = t[z].itag
-							audioAdr_isCipher = t[z].isCipher
+							aAdr_opus = GetAdr(t[z].Address, t[z].isCipher)
+							aItag_opus = t[z].itag
+							aAdr_isCipher = t[z].isCipher
+						elseif not aItag then
+							aAdr = GetAdr(t[z].Address, t[z].isCipher)
+							aItag = t[z].itag
+							aAdr_isCipher = t[z].isCipher
 						end
 					end
 				end
 			end
-		local sort_video_itags = {}
+		local sorted_vItags = {}
 			for i = 1, #video_itags do
 				for z = 1, #t do
 					if video_itags[i] == t[z].itag then
-						sort_video_itags[#sort_video_itags + 1] = t[z]
+						sorted_vItags[#sorted_vItags + 1] = t[z]
 					 break
 					end
 				end
 			end
-		if #sort_video_itags == 0 then
-			sort_video_itags = t
+		if #sorted_vItags == 0 then
+			sorted_vItags = t
 		end
-		local hash, sort_video = {}, {}
-			for i = 1, #sort_video_itags do
-				if not hash[sort_video_itags[i].Name] then
-					sort_video[#sort_video + 1] = sort_video_itags[i]
-					hash[sort_video_itags[i].Name] = true
+		local hash, sorted = {}, {}
+			for i = 1, #sorted_vItags do
+				if not hash[sorted_vItags[i].Name] then
+					sorted[#sorted + 1] = sorted_vItags[i]
+					hash[sorted_vItags[i].Name] = true
 				end
 			end
 		t = {}
-			local function stream(v)
-				local adr = GetAdr(v.Address, v.isCipher)
-				if v.isAdaptive == true and audioItag then
-					local extOpt_demux, adr_audio, itag_audio, captionsAdr
-					if (audioItag_opus and captions)
-						and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
-					then
-						adr_audio = audioAdr_opus
-						itag_audio = audioItag_opus
-						captionsAdr = captions
-					else
-						adr_audio = audioAdr
-						itag_audio = audioItag
-						extOpt_demux = '$OPT:demux=avcodec,any'
-					end
-					v.audioItag = itag_audio
-					v.Address = adr
-									.. (adrStart or '')
-									.. (extOpt_demux or '')
-									.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-									.. adr_audio
-									.. (captionsAdr or '')
-				else
-					v.Address = adr
-									.. (adrStart or '')
-									.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-									.. (captions or '')
-				end
-			 return v
-			end
-			for _, v in pairs(sort_video) do
+			for _, v in pairs(sorted) do
 				if v.qlty > 300 then
-					t[#t + 1] = stream(v)
+					t[#t + 1] = Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 				end
 			end
 		if #t == 0 then
-			for _, v in pairs(sort_video) do
-				t[#t + 1] = stream(v)
+			for _, v in pairs(sorted) do
+				t[#t + 1] = Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 			end
 		end
 			if #t == 0 then
 				m_simpleTV.Http.Close(session)
 			 return nil, 'GetStreamsTab Error 2'
 			end
-		local audioAdrName, audioId, itag_a
-		if audioAdr_opus or audioAdr then
-			audioAdr = (audioAdr_opus or audioAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT'
-			audioAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
+		local aAdrName, audioId, itag_a
+		if aAdr_opus or aAdr then
+			aAdr = (aAdr_opus or aAdr) .. (adrStart or '') .. '$OPT:NO-STIMESHIFT'
+			aAdrName = '🔉 ' .. m_simpleTV.User.YT.Lng.audio
 			audioId = 99
 			if infoInFile then
-				itag_a = audioAdr:match('itag=(%d+)')
+				itag_a = aAdr:match('itag=(%d+)')
 			end
 		else
-			audioAdr = 'vlc://pause:5'
-			audioAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
+			aAdr = 'vlc://pause:5'
+			aAdrName = '🔇 ' .. m_simpleTV.User.YT.Lng.noAudio
 			audioId = 10
 		end
-		t[#t + 1] = {Name = audioAdrName, qlty = audioId, Address = audioAdr, isCipher = audioAdr_isCipher, audioItag = itag_a}
-		table.sort(t, function(a, b) return a.qlty < b.qlty end)
+		table.insert(t, 1, {Name = aAdrName, qlty = audioId, Address = aAdr, isCipher = aAdr_isCipher, aItag = itag_a})
 			for i = 1, #t do
 				t[i].Id = i
 			end
@@ -4133,7 +4126,7 @@ https://github.com/grafi-tt/lunaJson
 						.. 'url: https://www.youtube.com/watch?v=' .. m_simpleTV.User.YT.vId .. '\n'
 						.. string_rep
 						.. 'video itag: ' .. tostring(t[index].itag)
-						.. ' | audio itag: ' .. tostring(t[index].audioItag) .. '\n'
+						.. ' | audio itag: ' .. tostring(t[index].aItag) .. '\n'
 						.. string_rep
 						.. 'cipher: ' .. tostring(t[index].isCipher)
 						.. ' | sts: ' .. tostring(m_simpleTV.User.YT.sts) .. '\n'
