@@ -2183,12 +2183,11 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		local sort_video_itags, u = {}, 1
+		local sort_video_itags = {}
 			for i = 1, #video_itags do
 				for z = 1, #t do
 					if video_itags[i] == t[z].itag then
-						sort_video_itags[u] = t[z]
-						u = u + 1
+						sort_video_itags[#sort_video_itags + 1] = t[z]
 					 break
 					end
 				end
@@ -2199,16 +2198,15 @@ https://github.com/grafi-tt/lunaJson
 		local hash, sort_video = {}, {}
 			for i = 1, #sort_video_itags do
 				if not hash[sort_video_itags[i].Name] then
-					u = #sort_video + 1
-					sort_video[u] = sort_video_itags[i]
+					sort_video[#sort_video + 1] = sort_video_itags[i]
 					hash[sort_video_itags[i].Name] = true
 				end
 			end
-		t, u = {}, 1
-		local extOpt = '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
-			local function streams(v, u)
-				local extOpt_demux, adr_audio, itag_audio, captionsAdr
+		t = {}
+			local function stream(v)
+				local adr = GetAdr(v.Address, v.isCipher)
 				if v.isAdaptive == true and audioItag then
+					local extOpt_demux, adr_audio, itag_audio, captionsAdr
 					if (audioItag_opus and captions)
 						and not (v.qlty > 1080 or v.itag == 302 or v.itag == 334)
 					then
@@ -2220,34 +2218,29 @@ https://github.com/grafi-tt/lunaJson
 						itag_audio = audioItag
 						extOpt_demux = '$OPT:demux=avcodec,any'
 					end
-					t[u] = v
-					t[u].audioItag = itag_audio
-					t[u].Address = GetAdr(v.Address, v.isCipher)
+					v.audioItag = itag_audio
+					v.Address = adr
 									.. (adrStart or '')
 									.. (extOpt_demux or '')
-									.. extOpt
+									.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
 									.. adr_audio
 									.. (captionsAdr or '')
-					u = u + 1
-				end
-				if v.isAdaptive == false then
-					t[u] = v
-					t[u].Address = GetAdr(v.Address, v.isCipher)
+				else
+					v.Address = adr
 									.. (adrStart or '')
-									.. extOpt
+									.. '$OPT:sub-track=0$OPT:NO-STIMESHIFT$OPT:input-slave='
 									.. (captions or '')
-					u = u + 1
 				end
-			 return t, u
+			 return v
 			end
 			for _, v in pairs(sort_video) do
 				if v.qlty > 300 then
-					v, u = streams(v, u)
+					t[#t + 1] = stream(v)
 				end
 			end
 		if #t == 0 then
 			for _, v in pairs(sort_video) do
-				v, u = streams(v, u)
+				t[#t + 1] = stream(v)
 			end
 		end
 			if #t == 0 then
@@ -2287,11 +2280,7 @@ https://github.com/grafi-tt/lunaJson
 				SetBackground()
 			end
 		elseif captions_title then
-			if tostring(m_simpleTV.Config.GetValue('subtitle/disableAtStart', 'simpleTVConfig') or '') == 'true' then
-				title = title .. '\n☐ ' .. m_simpleTV.User.YT.Lng.sub .. captions_title
-			else
-				title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.sub .. captions_title
-			end
+			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.sub .. captions_title
 		end
 		if m_simpleTV.User.YT.isAuth
 			and m_simpleTV.User.YT.isLive == false
