@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (22/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (23/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,9 @@
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work' (https://addons.mozilla.org/en-US/firefox/addon/cookies-txt )
 -- показать на OSD плейлист / выбор качества: Ctrl+M
+--------------------------------------------------------------------
 local infoInFile = false
+--------------------------------------------------------------------
 		if m_simpleTV.Control.ChangeAddress ~= 'No' then return end
 		if not m_simpleTV.Control.CurrentAddress:match('^[%p%a%s]*https?://[%a%.]*youtu[%.combe]')
 			and not m_simpleTV.Control.CurrentAddress:match('^https?://[w%.]*hooktube%.com')
@@ -2207,34 +2209,34 @@ https://github.com/grafi-tt/lunaJson
 					end
 				end
 			end
-		local sorted_vItags = {}
+		local sort = {}
 			for i = 1, #video_itags do
 				for z = 1, #t do
 					if video_itags[i] == t[z].itag then
-						sorted_vItags[#sorted_vItags + 1] = t[z]
+						sort[#sort + 1] = t[z]
 					 break
 					end
 				end
 			end
-		if #sorted_vItags == 0 then
-			sorted_vItags = t
+		if #sort == 0 then
+			sort = t
 		end
-		local hash, sorted = {}, {}
-			for i = 1, #sorted_vItags do
-				if not hash[sorted_vItags[i].Name] then
-					sorted[#sorted + 1] = sorted_vItags[i]
-					hash[sorted_vItags[i].Name] = true
+		local hash, noDuplicate = {}, {}
+			for i = 1, #sort do
+				if not hash[sort[i].Name] then
+					noDuplicate[#noDuplicate + 1] = sort[i]
+					hash[sort[i].Name] = true
 				end
 			end
 		t = {}
-			for _, v in pairs(sorted) do
-				if v.qlty > 300 then
-					t[#t + 1] = Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+			for i = 1, #noDuplicate do
+				if noDuplicate[i].qlty > 300 then
+					t[#t + 1] = Stream(noDuplicate[i], adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 				end
 			end
 		if #t == 0 then
-			for _, v in pairs(sorted) do
-				t[#t + 1] = Stream(v, adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
+			for i = 1, #noDuplicate do
+				t[#t + 1] = Stream(noDuplicate[i], adrStart, aAdr, aItag, aAdr_opus, aItag_opus, captions)
 			end
 		end
 			if #t == 0 then
