@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (23/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (24/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -172,7 +172,7 @@ local infoInFile = false
 	end
 	m_simpleTV.Control.ChangeAddress = 'Yes'
 	m_simpleTV.Control.CurrentAddress = 'error'
-	local userAgent = 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36'
+	local userAgent = 'Mozilla/5.0 (Windows NT 10.0; rv:84.0) Gecko/20100101 Firefox/84.0'
 	local userAgent2 = 'Mozilla/5.0 (SMART-TV; Linux; Tizen 4.0.0.2) AppleWebkit/605.1.15 (KHTML, like Gecko) SamsungBrowser/9.2 TV Safari/605.1.15'
 	local session = m_simpleTV.Http.New(userAgent)
 		if not session then return end
@@ -1198,80 +1198,30 @@ https://github.com/grafi-tt/lunaJson
 			types = 'channel'
 			header = m_simpleTV.User.YT.Lng.channel
 			yt = 'channel/'
-			stopSearch = 120
+			stopSearch = 149
 		elseif sAdr:match('^%s*%-%s*%-') then
 			types = 'playlist'
 			header = m_simpleTV.User.YT.Lng.plst
 			yt = 'playlist?list='
-			stopSearch = 150
+			stopSearch = 149
 		elseif sAdr:match('^%s*%-%s*%+') then
 			eventType = '&eventType=live'
 			types = 'video'
 			header = m_simpleTV.User.YT.Lng.live
 			yt = 'watch?v='
-			stopSearch = 90
+			stopSearch = 149
 		elseif sAdr:match('^%-related=') then
 			sAdr = sAdr:gsub('%-related=', '')
 			types = 'related'
 			header = m_simpleTV.User.YT.Lng.relatedVideos
 			yt = 'watch?v='
-			stopSearch = 90
+			stopSearch = 149
 		else
 			types = 'video&videoDimension=2d'
 			header = m_simpleTV.User.YT.Lng.video
 			yt = 'watch?v='
-			stopSearch = 90
+			stopSearch = 199
 		end
-			if types == 'video&videoDimension=2d' then
-				sAdr = sAdr:gsub('^[%-%+%s]+(.-)%s*$', '%1')
-				sAdr = m_simpleTV.Common.multiByteToUTF8(sAdr)
-				sAdr = m_simpleTV.Common.toPercentEncoding(sAdr)
-				local k, i = 1, 1
-				local tab, name, dur, desc, length_seconds, panelDescName, err
-				local t = {}
-					for j = 1, 10 do
-							if k > stopSearch then break end
-						url = 'https://youtube.com/search_ajax?style=json&search_query=' .. sAdr .. '&page=' .. j .. '&hl=' .. m_simpleTV.User.YT.Lng.hl
-						m_simpleTV.Http.SetCookies(session, url, m_simpleTV.User.YT.cookies, '')
-						local rc, answer = m_simpleTV.Http.Request(session, {url = url, headers = 'X-YouTube-Client-Name: 56\nX-YouTube-Client-Version: 20200911\nReferer: https://www.youtube.com/'})
-							if rc ~= 200 then break end
-						err, tab = pcall(lunaJson_decode, answer)
-							if err == false then return end
-						i = 1
-							while true do
-									if not tab.video[i] or k > stopSearch then break end
-								length_seconds = tonumber(tab.video[i].length_seconds or '0')
-								if length_seconds > 0 then
-									name = title_clean(tab.video[i].title)
-									dur = tab.video[i].duration
-									t[k] = {}
-									t[k].Id = k
-									t[k].Address = 'https://www.youtube.com/' .. yt .. tab.video[i].encrypted_id
-									t[k].Name = name .. ' (' .. dur .. ')'
-									if isInfoPanel == true then
-										t[k].InfoPanelLogo = 'https://i.ytimg.com/vi/' .. tab.video[i].encrypted_id .. '/default.jpg'
-										t[k].InfoPanelName = name
-										t[k].InfoPanelShowTime = 10000
-										desc = tab.video[i].description
-										panelDescName = nil
-										if desc and desc ~= '' then
-											panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
-										end
-										t[k].InfoPanelDesc = desc_html(desc, t[k].InfoPanelLogo, name, t[k].Address)
-										t[k].InfoPanelTitle = (panelDescName or '')
-															.. m_simpleTV.User.YT.Lng.channel
-															.. ': ' .. title_clean(tab.video[i].author)
-															.. ' | ' .. dur
-									end
-									k = k + 1
-								end
-								i = i + 1
-							end
-						j = j + 1
-					end
-					if k == 1 then return end
-			 return t, types, header
-			end
 		if not m_simpleTV.User.YT.apiKey then
 			GetApiKey()
 		end
@@ -1294,7 +1244,7 @@ https://github.com/grafi-tt/lunaJson
 					if rc ~= 200 then break end
 					if not answer:match('"id"') then break end
 				local err, tab = pcall(lunaJson_decode, answer)
-					if err == false then return end
+					if err == false then break end
 				j = 1
 					while true do
 							if not tab.items[j] or k > stopSearch then break end
