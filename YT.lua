@@ -12,7 +12,6 @@
 	limitations under the License.
 ]]
 -- https://github.com/Nexterr/simpleTV-script-YT
--- использовались скрипты http://iptv.gen12.net/bugtracker/view.php?id=986
 -- UTF-8 without BOM
 -- поиск из окна "Открыть URL" (Ctrl+N), префиксы: - (видео), -- (плейлисты), --- (каналы), -+ (прямые трансляции)
 -- авторизаця: файл формата "Netscape HTTP Cookie File" - cookies.txt поместить в папку 'work' (https://addons.mozilla.org/en-US/firefox/addon/cookies-txt )
