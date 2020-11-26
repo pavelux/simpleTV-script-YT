@@ -1673,6 +1673,49 @@ https://github.com/grafi-tt/lunaJson
 			end
 	 return adr
 	end
+	local function StreamLive(hls, isLive, title)
+		local session = m_simpleTV.Http.New(userAgent)
+			if not session then return end
+		m_simpleTV.Http.SetTimeout(session, 8000)
+		local extOpt = '$OPT:adaptive-use-access'
+		local rc, answer = m_simpleTV.Http.Request(session, {url = hls})
+		m_simpleTV.Http.Close(session)
+			if rc ~= 200 then
+			 return nil, 'GetStreamsTab live Error 1'
+			end
+		local t, i = {}, 1
+			for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
+				name = tonumber(name:match('x(%d+)') or '0')
+				local qlty
+				if name > 240 then
+					if tonumber(fps) > 30 then
+						qlty = name + 6
+						fps = ' ' .. fps .. ' FPS'
+					else
+						qlty = name
+						fps = ''
+					end
+					t[i] = {}
+					t[i].Id = i
+					t[i].Name = name .. 'p' .. fps
+					t[i].Address = adr .. extOpt
+					t[i].qltyLive = qlty
+					i = i + 1
+				end
+			end
+			if #t == 0 then
+			 return nil, 'GetStreamsTab live Error 2'
+			end
+		t[#t + 1] = {}
+		t[#t].Id = #t
+		t[#t].qltyLive = 10000
+		t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
+		t[#t].Address = hls .. extOpt
+		if isLive == true then
+			title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
+		end
+	 return t, title
+	end
 	local function GetQltyIndex(t)
 		if (m_simpleTV.User.YT.qlty < 300
 			and m_simpleTV.User.YT.qlty > 100)
@@ -1963,43 +2006,8 @@ https://github.com/grafi-tt/lunaJson
 			if tab.streamingData and tab.streamingData.hlsManifestUrl
 				and (tab.videoDetails.isLiveContent == true or tab.videoDetails.isLive == true)
 			then
-				local extOpt = '$OPT:adaptive-use-access'
-				local rc, answer = m_simpleTV.Http.Request(session, {url = tab.streamingData.hlsManifestUrl})
 				m_simpleTV.Http.Close(session)
-					if rc ~= 200 then
-					 return nil, 'GetStreamsTab live Error 1'
-					end
-				local qlty
-					for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
-						name = tonumber(name:match('x(%d+)') or '0')
-						if name > 240 then
-							if tonumber(fps) > 30 then
-								qlty = name + 6
-								fps = ' ' .. fps .. ' FPS'
-							else
-								qlty = name
-								fps = ''
-							end
-							t[i] = {}
-							t[i].Id = i
-							t[i].Name = name .. 'p' .. fps
-							t[i].Address = adr .. extOpt
-							t[i].qltyLive = qlty
-							i = i + 1
-						end
-					end
-					if #t == 0 then
-					 return nil, 'GetStreamsTab live Error 2'
-					end
-				t[#t + 1] = {}
-				t[#t].Id = #t
-				t[#t].qltyLive = 10000
-				t[#t].Name = '▫ ' .. m_simpleTV.User.YT.Lng.adaptiv
-				t[#t].Address = tab.streamingData.hlsManifestUrl .. extOpt
-				if tab.videoDetails.isLive == true then
-					title = title .. '\n☑ ' .. m_simpleTV.User.YT.Lng.live
-				end
-			 return t, title
+			 return StreamLive(tab.streamingData.hlsManifestUrl, tab.videoDetails.isLive, title)
 			end
 		if tab.streamingData and tab.streamingData.formats then
 			local k = 1
