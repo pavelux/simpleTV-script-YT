@@ -1,4 +1,4 @@
--- видеоскрипт для сайта https://www.youtube.com (25/11/20)
+-- видеоскрипт для сайта https://www.youtube.com (27/11/20)
 --[[
 	Copyright © 2017-2020 Nexterr
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -1190,35 +1190,30 @@ https://github.com/grafi-tt/lunaJson
 		m_simpleTV.Control.SetTitle(err)
 	end
 	local function Search(sAdr)
-		local types, yt, header, stopSearch, url
+		local types, yt, header, url
 		local eventType = ''
 		if sAdr:match('^%s*%-%s*%-%s*%-') then
 			types = 'channel'
 			header = m_simpleTV.User.YT.Lng.channel
 			yt = 'channel/'
-			stopSearch = 149
 		elseif sAdr:match('^%s*%-%s*%-') then
 			types = 'playlist'
 			header = m_simpleTV.User.YT.Lng.plst
 			yt = 'playlist?list='
-			stopSearch = 149
 		elseif sAdr:match('^%s*%-%s*%+') then
 			eventType = '&eventType=live'
 			types = 'video'
 			header = m_simpleTV.User.YT.Lng.live
 			yt = 'watch?v='
-			stopSearch = 149
 		elseif sAdr:match('^%-related=') then
 			sAdr = sAdr:gsub('%-related=', '')
 			types = 'related'
 			header = m_simpleTV.User.YT.Lng.relatedVideos
 			yt = 'watch?v='
-			stopSearch = 149
 		else
 			types = 'video&videoDimension=2d'
 			header = m_simpleTV.User.YT.Lng.video
 			yt = 'watch?v='
-			stopSearch = 199
 		end
 		if not m_simpleTV.User.YT.apiKey then
 			GetApiKey()
@@ -1233,23 +1228,21 @@ https://github.com/grafi-tt/lunaJson
 		end
 		local t = {}
 		local k, i = 1, 1
-		local j, nextPageToken
-		local name, desc, panelDescName
 		local adrUrl = url
 			while true do
-					if k > stopSearch then break end
+					if k > 200 then break end
 				local rc, answer = m_simpleTV.Http.Request(session, {url = adrUrl, headers = m_simpleTV.User.YT.apiKeyHeader})
 					if rc ~= 200 then break end
 					if not answer:match('"id"') then break end
 				local err, tab = pcall(lunaJson_decode, answer)
 					if err == false then break end
-				j = 1
+				local j = 1
 					while true do
-							if not tab.items[j] or k > stopSearch then break end
+							if not tab.items[j] or k > 200 then break end
 						if eventType == '&eventType=live'
 							or (eventType == '' and tab.items[j].snippet.liveBroadcastContent ~= 'live')
 						then
-							name = title_clean(tab.items[j].snippet.title)
+							local name = title_clean(tab.items[j].snippet.title)
 							t[k] = {}
 							t[k].Id = k
 							t[k].Name = name
@@ -1266,8 +1259,8 @@ https://github.com/grafi-tt/lunaJson
 								end
 								t[k].InfoPanelName = name
 								t[k].InfoPanelShowTime = 10000
-								desc = tab.items[j].snippet.description
-								panelDescName = nil
+								local desc = tab.items[j].snippet.description
+								local panelDescName
 								if desc and desc ~= '' then
 									panelDescName = m_simpleTV.User.YT.Lng.desc .. ' | '
 								end
@@ -1282,7 +1275,7 @@ https://github.com/grafi-tt/lunaJson
 						end
 						j = j + 1
 					end
-				nextPageToken = answer:match('"nextPageToken": "([^"]+)')
+				local nextPageToken = answer:match('"nextPageToken": "([^"]+)')
 					if not nextPageToken then break end
 				adrUrl = url .. '&pageToken=' .. nextPageToken
 			end
@@ -1976,6 +1969,7 @@ https://github.com/grafi-tt/lunaJson
 					if rc ~= 200 then
 					 return nil, 'GetStreamsTab live Error 1'
 					end
+				local qlty
 					for name, fps, adr in answer:gmatch('RESOLUTION=(.-),.-RATE=(%d+).-\n(.-)\n') do
 						name = tonumber(name:match('x(%d+)') or '0')
 						if name > 240 then
@@ -2096,7 +2090,7 @@ https://github.com/grafi-tt/lunaJson
 					t[i].qlty = 1440
 				elseif t[i].qlty > 1500 and t[i].qlty <= 2800 then
 					t[i].qlty = 2160
-				elseif t[i].qlty > 2800 and t[i].qlty <= 4500 then
+				else
 					t[i].qlty = 4320
 				end
 				t[i].Name = t[i].qlty .. 'p'
